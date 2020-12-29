@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.4.3-alpha - 2020-12-29
+
+
+### Miscellaneous Chores
+
+[439cc3](https://github.com/pjvds/tunl/commit/439cc329d18c3bf5a4e1ba467091d5dae5cbe6f3) - fix docker hub login - [pjvds](https://github.com/pjvds)
+
+[77188e](https://github.com/pjvds/tunl/commit/77188e7f6a858220067f4c805ad27335caa1f136) - publich docker images to docker hub - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.4.1-alpha - 2020-12-29
 
 
