@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.4.0-alpha - 2020-12-29
+
+
+### Features
+
+[674908](https://github.com/pjvds/tunl/commit/6749087efe5c90a6831bfecc7b168f6b824b25cf) - move host flag to app instead of commands - [pjvds](https://github.com/pjvds)
+
+
+### Miscellaneous Chores
+
+[22b848](https://github.com/pjvds/tunl/commit/22b848511cb24f4fc3f5f4f9257275914435305b) - use build artifact for docker images - [pjvds](https://github.com/pjvds)
+
+[5eea74](https://github.com/pjvds/tunl/commit/5eea7482b9ca0324ac1eb577d3a4d8f82e9b0bd4) - fix docker image templates - [pjvds](https://github.com/pjvds)
+
+[692bc1](https://github.com/pjvds/tunl/commit/692bc12d2cee44f552196c25b4460ccef33846b0) - distribute tunl as docker image - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.3.0-alpha - 2020-12-29
 
 
