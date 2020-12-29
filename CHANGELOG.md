@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.4.4-alpha - 2020-12-29
+
+
+### Bug Fixes
+
+[264089](https://github.com/pjvds/tunl/commit/2640894c182494542ffef60b9b4718136ea1039c) - fix incorrect entrypoint for tunl docker image - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.4.3-alpha - 2020-12-29
 
 
