@@ -94,7 +94,7 @@ var DaemonCommand = &cli.Command{
 
 					control, err := session.AcceptStream()
 					if err != nil {
-						logger.Error("failed to accept control stream", zap.Error(err))
+						logger.Error("accept control stream error", zap.Error(err))
 						return
 					}
 					defer control.Close()
@@ -108,7 +108,7 @@ var DaemonCommand = &cli.Command{
 
 					targetURL, err := url.Parse(string(line))
 					if err != nil {
-						logger.Error("handshake failed", zap.Error(err))
+						logger.Error("handshake error", zap.Error(err))
 						return
 					}
 
