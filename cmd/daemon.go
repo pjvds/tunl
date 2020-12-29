@@ -87,7 +87,7 @@ var DaemonCommand = &cli.Command{
 
 					session, err := yamux.Server(conn, nil)
 					if err != nil {
-						failed <- errors.Wrap(err, "failed to create server")
+						logger.Debug("mux server creation error", zap.Error(err))
 						return
 					}
 					defer session.Close()
