@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/hashicorp/yamux"
+	"github.com/inconshreveable/go-vhost"
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
@@ -19,168 +19,155 @@ import (
 	"go.uber.org/zap"
 )
 
-type Tunnel struct {
-	id      string
-	handler http.Handler
-	session *yamux.Session
-}
-
 var DaemonCommand = &cli.Command{
 	Name:   "daemon",
 	Hidden: true,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:  "http",
+			Name:  "bind",
 			Value: ":8080",
 		},
 		&cli.StringFlag{
 			Name:  "control",
-			Value: ":8081",
+			Value: "_.tunl.es",
+		},
+		&cli.StringFlag{
+			Name:  "domain",
+			Value: "tunl.es",
 		},
 	},
 	Action: func(ctx *cli.Context) error {
-		bind := ctx.String("control")
+		bind := ctx.String("bind")
 		if len(bind) == 0 {
-			logger.Error("missing control argument")
+			logger.Error("bind flag value cannot be empty")
 			return nil
 		}
-		logger.Info("binding control", zap.String("control", bind))
 
 		listener, err := net.Listen("tcp", bind)
 		if err != nil {
-			logger.Error("failed to listen", zap.Error(err), zap.String("bind", bind))
+			logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
 			return nil
 		}
 
-		tunnels := make(map[string]*Tunnel)
+		mux, err := vhost.NewHTTPMuxer(listener, 30*time.Second)
+		if err != nil {
+			logger.Error("vhost mux creation error", zap.Error(err))
+			return nil
+		}
+		defer mux.Close()
+
 		haikunator := haikunator.New(time.Now().UTC().UnixNano())
 
 		failed := make(chan error)
 
-		http.HandleFunc("/", func(response http.ResponseWriter, request *http.Request) {
-			logger.Debug("handling http request", zap.String("method", request.Method), zap.String("host", request.Host))
+		go func() {
+			logger.Debug("creating control vhost", zap.String("control", ctx.String("control")))
 
-			parts := strings.Split(request.Host, ".")
-			tunnel, ok := tunnels[parts[0]]
-			if !ok {
-				http.Error(response, fmt.Sprintf("tunnel %v not found", parts[0]), http.StatusNotFound)
+			control, err := mux.Listen(ctx.String("control"))
+			if err != nil {
+				failed <- errors.Wrap(err, "control vhost listener creation error")
 				return
 			}
 
-			logger.Debug("invoking http handler of tunnel", zap.String("id", parts[0]))
+			logger.Debug("control vhost created", zap.String("control", ctx.String("control")))
 
-			tunnel.handler.ServeHTTP(response, request)
-		})
-
-		go func() {
-			for {
-				conn, err := listener.Accept()
-				if err != nil {
-					failed <- errors.Wrap(err, "failed to accept connection")
+			failed <- http.Serve(control, http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
+				if request.Method != http.MethodConnect {
+					http.Error(response, "method not allowed", http.StatusMethodNotAllowed)
 					return
 				}
 
-				logger.Debug("new connection")
+				conn, _, err := response.(http.Hijacker).Hijack()
+				if err != nil {
+					logger.Debug("http hijack error", zap.Error(err))
+					http.Error(response, "internal server error", http.StatusInternalServerError)
+					return
+				}
+				defer conn.Close()
 
-				go func(conn net.Conn) {
-					defer conn.Close()
+				hostname := haikunator.Haikunate() + "." + ctx.String("domain")
+				vhost, err := mux.Listen(hostname)
+				if err != nil {
+					logger.Error("vhost listen error", zap.Error(err))
+					return
+				}
+				defer vhost.Close()
 
-					session, err := yamux.Server(conn, nil)
+				accepted := &http.Response{
+					StatusCode: http.StatusOK,
+					Header: http.Header{
+						"X-Tunl-Hostname": []string{hostname},
+					},
+				}
+				if err := accepted.Write(conn); err != nil {
+					logger.Error("failed to accept control stream", zap.Error(err))
+					return
+				}
+
+				session, err := yamux.Server(conn, nil)
+				if err != nil {
+					logger.Debug("mux server creation error", zap.Error(err))
+					http.Error(response, "internal server error", http.StatusInternalServerError)
+					return
+				}
+				defer session.Close()
+
+				targetURL, err := url.Parse("https://httpstatuses.com")
+				if err != nil {
+					logger.Error("handshake error", zap.Error(err))
+					return
+				}
+
+				logger.Debug("handshake success", zap.String("target-url", targetURL.String()))
+
+				go http.Serve(vhost, http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
+					upstream, err := session.Open()
 					if err != nil {
-						logger.Debug("mux server creation error", zap.Error(err))
+						http.Error(response, "bad gateway: "+err.Error(), http.StatusBadGateway)
+						http.Error(response, err.Error(), 500)
 						return
 					}
-					defer session.Close()
 
-					control, err := session.AcceptStream()
-					if err != nil {
-						logger.Error("accept control stream error", zap.Error(err))
-						return
-					}
-					defer control.Close()
+					defer upstream.Close()
+					logger.Debug("session opened", zap.String("remote", upstream.RemoteAddr().String()), zap.String("local", upstream.LocalAddr().String()))
 
-					reader := bufio.NewReader(control)
-					line, _, err := reader.ReadLine()
-					if err != nil {
-						logger.Error("failed to read handshake", zap.Error(err))
+					if err := request.WriteProxy(upstream); err != nil {
+						http.Error(response, "failed to write request: "+err.Error(), http.StatusBadGateway)
 						return
 					}
 
-					targetURL, err := url.Parse(string(line))
+					upstreamResponse, err := http.ReadResponse(bufio.NewReader(upstream), request)
 					if err != nil {
-						logger.Error("handshake error", zap.Error(err))
+						http.Error(response, "failed to read response: "+err.Error(), http.StatusBadGateway)
 						return
 					}
 
-					logger.Debug("handshake success", zap.String("target-url", targetURL.String()))
-
-					var hostname string
-					for {
-						hostname = haikunator.Haikunate()
-
-						if _, exists := tunnels[hostname]; exists {
-							continue
+					for header, values := range upstreamResponse.Header {
+						for _, value := range values {
+							response.Header().Add(header, value)
 						}
-						break
 					}
 
-					if _, err := control.Write([]byte(hostname + "\n")); err != nil {
-						logger.Error("failed to accept control stream", zap.Error(err))
-						return
+					response.WriteHeader(upstreamResponse.StatusCode)
+					if upstreamResponse.Body != nil {
+						io.Copy(response, upstreamResponse.Body)
 					}
+				}))
 
-					tunnel := &Tunnel{
-						id:      hostname,
-						session: session,
-						handler: http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
-							upstream, err := session.Open()
-							if err != nil {
-								http.Error(response, "bad gateway: "+err.Error(), http.StatusBadGateway)
-								http.Error(response, err.Error(), 500)
-								return
-							}
-
-							defer upstream.Close()
-							logger.Debug("session opened", zap.String("remote", upstream.RemoteAddr().String()), zap.String("local", upstream.LocalAddr().String()))
-
-							if err := request.WriteProxy(upstream); err != nil {
-								http.Error(response, "failed to write request: "+err.Error(), http.StatusBadGateway)
-								return
-							}
-
-							upstreamResponse, err := http.ReadResponse(bufio.NewReader(upstream), request)
-							if err != nil {
-								http.Error(response, "failed to read response: "+err.Error(), http.StatusBadGateway)
-								return
-							}
-
-							for header, values := range upstreamResponse.Header {
-								for _, value := range values {
-									response.Header().Add(header, value)
-								}
-							}
-
-							response.WriteHeader(upstreamResponse.StatusCode)
-							if upstreamResponse.Body != nil {
-								io.Copy(response, upstreamResponse.Body)
-							}
-						}),
-					}
-
-					logger.Info("tunnel created", zap.String("hostname", hostname))
-					tunnels[hostname] = tunnel
-
-					<-session.CloseChan()
-					delete(tunnels, hostname)
-
-					logger.Info("session closed", zap.String("hostname", hostname))
-				}(conn)
-			}
+				<-session.CloseChan()
+			}))
 		}()
 
 		go func() {
-			logger.Info("binding http listener", zap.String("address", ctx.String("http")))
-			failed <- http.ListenAndServe(ctx.String("http"), nil)
+			for {
+				conn, err := mux.NextError()
+				logger.Debug("mux error", zap.Error(err))
+
+				if conn != nil {
+					fmt.Fprintln(conn, "500", err.Error())
+					conn.Close()
+				}
+			}
 		}()
 
 		if err := <-failed; err != nil {

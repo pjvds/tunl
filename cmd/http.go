@@ -19,7 +19,7 @@ var HttpCommand = &cli.Command{
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:  "server",
-			Value: "localhost:8081",
+			Value: "_.tunl.es:80",
 		},
 		&cli.BoolFlag{
 			Name:  "access-log",
@@ -54,25 +54,36 @@ var HttpCommand = &cli.Command{
 		}
 		defer conn.Close()
 
-		session, err := yamux.Client(conn, nil)
+		request, _ := http.NewRequest(http.MethodConnect, "/", nil)
+		request.Host = ctx.String("server")
+		request.Header.Add("X-Tunl", targetURL.String())
+
+		if err := request.Write(conn); err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			return nil
+		}
+
+		reader := bufio.NewReader(conn)
+		response, err := http.ReadResponse(reader, request)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
+			return nil
+		}
+
+		if response.StatusCode != http.StatusOK {
+			fmt.Fprintln(os.Stderr, response.Status)
+			return nil
+		}
+
+		hostname := response.Header.Get("X-Tunl-Hostname")
+		fmt.Println(hostname)
+
+		session, err := yamux.Client(conn, nil)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "mux client creation error: "+err.Error())
 			return nil
 		}
 		defer session.Close()
-
-		control, err := session.OpenStream()
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			return nil
-		}
-
-		control.Write([]byte(targetURL.String() + "\n"))
-
-		reader := bufio.NewReader(control)
-		hostname, _, err := reader.ReadLine()
-
-		fmt.Fprintln(os.Stderr, "exposed at: "+string(hostname))
 
 		handler := handlers.LoggingHandler(os.Stdout, proxy)
 
