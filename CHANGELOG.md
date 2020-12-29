@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.3.0-alpha - 2020-12-29
+
+
+### Bug Fixes
+
+[c5e4fa](https://github.com/pjvds/tunl/commit/c5e4fa5a5693a6c5ae63fb84012842c27cba6ff5) - files command not compatible with latest version changes - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[cefb6d](https://github.com/pjvds/tunl/commit/cefb6df3d6b04006109512e1a9830db39ae86604) - improve application input validdation and messages - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.2.0-alpha - 2020-12-29
 
 
