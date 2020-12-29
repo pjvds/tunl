@@ -11,7 +11,13 @@ import (
 
 func main() {
 	app := &cli.App{
-		Name:  "tunl",
+		Name: "tunl",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "host",
+				Value: "http://_.tunl.es",
+			},
+		},
 		Usage: "expose local file and services via a public tunnel",
 		Commands: []*cli.Command{
 			cmd.DaemonCommand,

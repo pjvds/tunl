@@ -3,7 +3,6 @@ package cmd
 import (
 	"bufio"
 	"fmt"
-	"net"
 	"net/http"
 	"os"
 
@@ -16,11 +15,6 @@ import (
 var FilesCommand = &cli.Command{
 	Name: "files",
 	Flags: []cli.Flag{
-		&cli.StringFlag{
-			Name:     "host",
-			Value:    "_.tunl.es:80",
-			Required: true,
-		},
 		&cli.BoolFlag{
 			Name:  "access-log",
 			Value: true,
@@ -34,22 +28,14 @@ var FilesCommand = &cli.Command{
 			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 		}
 
-		host := ctx.String("host")
-		if len(host) == 0 {
-			fmt.Println("Host cannot be empty, see --host flag for more information.\n")
-
-			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
-			return cli.Exit("Host cannot be empty.", 1)
-		}
-
-		conn, err := net.Dial("tcp", host)
+		conn, hostname, err := DialHost(ctx)
 		if err != nil {
-			return cli.Exit(fmt.Sprintf("Failed to connect to host %s: %v", host, err), 128)
+			return err
 		}
 		defer conn.Close()
 
 		request, _ := http.NewRequest(http.MethodConnect, "/", nil)
-		request.Host = ctx.String("host")
+		request.Host = hostname
 		request.Header.Add("X-Tunl-Type", "http")
 
 		if err := request.Write(conn); err != nil {
@@ -66,8 +52,7 @@ var FilesCommand = &cli.Command{
 			return cli.Exit(fmt.Sprintf("Unexpected connec reponse status %v", response.StatusCode), 128)
 		}
 
-		hostname := response.Header.Get("X-Tunl-Hostname")
-		fmt.Println(hostname)
+		fmt.Println(response.Header.Get("X-Tunl-Hostname"))
 
 		session, err := yamux.Client(conn, nil)
 		if err != nil {
