@@ -13,9 +13,9 @@ dockers:
     goos: linux
     goarch: amd64
     image_templates:
-      - "docker.pkg.github.com/org/repo/image-name:latest"
-      - "docker.pkg.github.com/org/repo/image-name:{{ .Tag }}"
-      - "docker.pkg.github.com/org/repo/image-name:v{{ .Major }}"
+      - "docker.pkg.github.com/pjvds/tunl/tunl:latest"
+      - "docker.pkg.github.com/pjvds/tunl/tunl:{{ .Tag }}"
+      - "docker.pkg.github.com/pjvds/tunl/tunl:v{{ .Major }}"
 archives:
   - replacements:
       darwin: Darwin
