@@ -15,6 +15,9 @@ dockers:
     binaries:
     - tunl
     image_templates:
+    - "tunl/tunl:latest"
+    - "tunl/tunl:{{ .Tag }}"
+    - "tunl/tunl:v{{ .Major }}.{{ .Minor }}"
     - "docker.pkg.github.com/pjvds/tunl/tunl:latest"
     - "docker.pkg.github.com/pjvds/tunl/tunl:{{ .Tag }}"
     - "docker.pkg.github.com/pjvds/tunl/tunl:v{{ .Major }}.{{ .Minor }}"
