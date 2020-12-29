@@ -1,6 +1,10 @@
+github = "https://github.com/pjvds/tunl"
+
 changelog_path = "CHANGELOG.md"
 pre_bump_hooks = []
 post_bump_hooks = []
-authors = []
+authors = [
+	{ signature = "Pieter Joost van de Sande", username = "pjvds" }
+]
 
 [commit_types]
