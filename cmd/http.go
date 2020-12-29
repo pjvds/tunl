@@ -18,7 +18,7 @@ var HttpCommand = &cli.Command{
 	Name: "http",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:  "server",
+			Name:  "host",
 			Value: "_.tunl.es:80",
 		},
 		&cli.BoolFlag{
@@ -26,16 +26,19 @@ var HttpCommand = &cli.Command{
 			Value: true,
 		},
 	},
+	ArgsUsage: "<url>",
 	Action: func(ctx *cli.Context) error {
 		var targetURL *url.URL
 		target := ctx.Args().First()
 		if len(target) == 0 {
-			return cli.Exit("missing target url", 128)
+			fmt.Println("You must specify the <url> argument\n")
+			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 		}
 
 		parsed, err := url.Parse(target)
 		if err != nil {
-			return cli.Exit("invalid target url", 128)
+			fmt.Printf("Invalid <url> argument value: %v\n\n", err)
+			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 		}
 		targetURL = parsed
 
@@ -47,10 +50,17 @@ var HttpCommand = &cli.Command{
 			request.Host = targetURL.Host
 		}
 
-		conn, err := net.Dial("tcp4", ctx.String("server"))
+		host := ctx.String("host")
+		if len(host) == 0 {
+			fmt.Println("Host cannot be empty, see --host flag for more information.\n")
+
+			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
+			return cli.Exit("Host cannot be empty.", 1)
+		}
+
+		conn, err := net.Dial("tcp", host)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			return nil
+			return cli.Exit(fmt.Sprintf("Failed connect server: %v", err), 1)
 		}
 		defer conn.Close()
 
@@ -59,8 +69,7 @@ var HttpCommand = &cli.Command{
 		request.Header.Add("X-Tunl", targetURL.String())
 
 		if err := request.Write(conn); err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			return nil
+			return cli.Exit(fmt.Sprintf("Failed to write connect request: %v", err), 1)
 		}
 
 		reader := bufio.NewReader(conn)
@@ -71,8 +80,7 @@ var HttpCommand = &cli.Command{
 		}
 
 		if response.StatusCode != http.StatusOK {
-			fmt.Fprintln(os.Stderr, response.Status)
-			return nil
+			return cli.Exit(fmt.Sprintf("Unexpect connect response status: %v", response.Status), 1)
 		}
 
 		hostname := response.Header.Get("X-Tunl-Hostname")
@@ -80,15 +88,14 @@ var HttpCommand = &cli.Command{
 
 		session, err := yamux.Client(conn, nil)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "mux client creation error: "+err.Error())
-			return nil
+			return cli.Exit(fmt.Sprintf("Failed to create multiplex client: %v", err), 1)
 		}
 		defer session.Close()
 
 		handler := handlers.LoggingHandler(os.Stdout, proxy)
 
 		if err := http.Serve(session, handler); err != nil {
-			return cli.Exit("serve error: "+err.Error(), 1)
+			return cli.Exit("fatal error: "+err.Error(), 1)
 		}
 
 		return nil
