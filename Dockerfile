@@ -1,4 +1,4 @@
 FROM scratch 
-COPY tunl /tunl
+COPY tunl tunl
 
-CMD ["/tunl"]
+ENTRYPOINT ["./tunl"]
