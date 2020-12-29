@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file. See [conven
 ## 0.1.0-alpha - 2020-12-29
 
 
+### Features
+
+[e95480](https://github.com/pjvds/tunl/commit/e95480af8bebbae2b40979d2fd8d93772e299d7f) - improve error log messages for handshake procedure - [pjvds](https://github.com/pjvds)
+
+
+### Miscellaneous Chores
+
+[51f26c](https://github.com/pjvds/tunl/commit/51f26ca58e7f52ceb1fafdc9be960e5a345e0098) - 0.1.0-alpha - [pjvds](https://github.com/pjvds)
+
+[457ae5](https://github.com/pjvds/tunl/commit/457ae5374d2ab471f3e0839741d99c13cf07eafa) - add github url and authors definition to cog config - [pjvds](https://github.com/pjvds)
+
+[5ba1de](https://github.com/pjvds/tunl/commit/5ba1de5f95503737e580f523f4b4c0e049a3b7ff) - add cocogitto and goreleaser configurations - [pjvds](https://github.com/pjvds)
+
+[252ab9](https://github.com/pjvds/tunl/commit/252ab9d8cc4e5528bfd87dfdca01c2285c8ecc64) - add release pipeline - [pjvds](https://github.com/pjvds)
+
+
+### Bug Fixes
+
+[627fb6](https://github.com/pjvds/tunl/commit/627fb6ae3d83e1147812dc8405f9264deeb32ab7) - do not fatal exit when creation of mux connection fails - [pjvds](https://github.com/pjvds)
+
+
+- - -
+## 0.1.0-alpha - 2020-12-29
+
+
 ### Miscellaneous Chores
 
 [5b482f](https://github.com/pjvds/tunl/commit/5b482f7dc4baaa950edb823967c5de550532ee8a) - add github url and authors definition to cog config - [pjvds](https://github.com/pjvds)
