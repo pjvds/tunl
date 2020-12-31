@@ -9,6 +9,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var (
+	version = "<unknown>"
+)
+
 func main() {
 	app := &cli.App{
 		Name: "tunl",
@@ -18,7 +22,8 @@ func main() {
 				Value: "http://_.tunl.es",
 			},
 		},
-		Usage: "expose local file and services via a public tunnel",
+		Version: version,
+		Usage:   "expose local file and services via a public tunnel",
 		Commands: []*cli.Command{
 			cmd.DaemonCommand,
 			cmd.FilesCommand,
