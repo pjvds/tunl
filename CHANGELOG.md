@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.5.0 - 2020-12-31
+
+
+### Features
+
+[54bf04](https://github.com/pjvds/tunl/commit/54bf042cb801b125b0d0d5f61cfb468ffc583c41) - expose version set during build - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.4.3-alpha - 2020-12-29
 
 
