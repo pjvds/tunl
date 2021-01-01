@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"io"
 	"net/url"
 
@@ -28,6 +29,12 @@ var DaemonCommand = &cli.Command{
 			Value: ":8080",
 		},
 		&cli.StringFlag{
+			Name: "tls-cert-file",
+		},
+		&cli.StringFlag{
+			Name: "tls-key-file",
+		},
+		&cli.StringFlag{
 			Name:  "control",
 			Value: "_.tunl.es",
 		},
@@ -43,10 +50,34 @@ var DaemonCommand = &cli.Command{
 			return nil
 		}
 
-		listener, err := net.Listen("tcp", bind)
-		if err != nil {
-			logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
-			return nil
+		var listener net.Listener
+
+		if certFile := ctx.String("tls-cert-file"); len(certFile) > 0 {
+			keyFile := ctx.String("tls-key-file")
+
+			cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+			if err != nil {
+				logger.Error("load certificate error", zap.Error(err), zap.String("cert", certFile), zap.String("key", keyFile))
+				return nil
+			}
+
+			tlsListener, err := tls.Listen("tcp", bind, &tls.Config{
+				Certificates: []tls.Certificate{cert},
+			})
+			if err != nil {
+				logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
+				return nil
+			}
+
+			listener = tlsListener
+		} else {
+			nonTlsListener, err := net.Listen("tcp", bind)
+			if err != nil {
+				logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
+				return nil
+			}
+
+			listener = nonTlsListener
 		}
 
 		mux, err := vhost.NewHTTPMuxer(listener, 30*time.Second)
