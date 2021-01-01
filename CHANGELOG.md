@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.7.1 - 2021-01-01
+
+
+### Bug Fixes
+
+[91a853](https://github.com/pjvds/tunl/commit/91a8531f4386f242060af86bd268466898043a90) - fix nil pointer in mux creation path - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.7.0 - 2021-01-01
 
 
