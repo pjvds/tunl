@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/url"
@@ -43,9 +44,21 @@ func DialHost(ctx *cli.Context) (net.Conn, string, error) {
 		cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 	}
 
-	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%v", hostnameWithoutPort, port))
-	if err != nil {
-		return nil, "", cli.Exit(fmt.Sprintf("Failed to connect to host %s: %v", host, err), 128)
+	var conn net.Conn
+	server := fmt.Sprintf("%s:%v", hostnameWithoutPort, port)
+
+	if hostURL.Scheme == "https" {
+		tlsConn, err := tls.Dial("tcp", server, &tls.Config{})
+		if err != nil {
+			return nil, "", cli.Exit(fmt.Sprintf("Failed to connect to host %s: %v", server, err), 128)
+		}
+		conn = tlsConn
+	} else {
+		nonTlsConn, err := net.Dial("tcp", server)
+		if err != nil {
+			return nil, "", cli.Exit(fmt.Sprintf("Failed to connect to host %s: %v", server, err), 128)
+		}
+		conn = nonTlsConn
 	}
 
 	return conn, hostnameWithoutPort, nil
