@@ -50,7 +50,6 @@ var DaemonCommand = &cli.Command{
 			return nil
 		}
 
-		var listener net.Listener
 		var mux *vhost.VhostMuxer
 
 		if certFile := ctx.String("tls-cert-file"); len(certFile) > 0 {
@@ -77,7 +76,6 @@ var DaemonCommand = &cli.Command{
 			}
 			defer mux.Close()
 
-			listener = tlsListener
 			mux = tlsMux.VhostMuxer
 		} else {
 			nonTlsListener, err := net.Listen("tcp", bind)
@@ -93,7 +91,6 @@ var DaemonCommand = &cli.Command{
 			}
 			defer httpMux.Close()
 
-			listener = nonTlsListener
 			mux = httpMux.VhostMuxer
 		}
 
