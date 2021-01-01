@@ -50,8 +50,7 @@ var DaemonCommand = &cli.Command{
 			return nil
 		}
 
-		var mux *vhost.VhostMuxer
-
+		var listener net.Listener
 		if certFile := ctx.String("tls-cert-file"); len(certFile) > 0 {
 			keyFile := ctx.String("tls-key-file")
 
@@ -68,31 +67,22 @@ var DaemonCommand = &cli.Command{
 				logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
 				return nil
 			}
-
-			tlsMux, err := vhost.NewHTTPMuxer(tlsListener, 30*time.Second)
-			if err != nil {
-				logger.Error("vhost tls mux creation error", zap.Error(err))
-				return nil
-			}
-			defer mux.Close()
-
-			mux = tlsMux.VhostMuxer
+			listener = tlsListener
 		} else {
 			nonTlsListener, err := net.Listen("tcp", bind)
 			if err != nil {
 				logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
 				return nil
 			}
-
-			httpMux, err := vhost.NewHTTPMuxer(nonTlsListener, 30*time.Second)
-			if err != nil {
-				logger.Error("vhost http mux creation error", zap.Error(err))
-				return nil
-			}
-			defer httpMux.Close()
-
-			mux = httpMux.VhostMuxer
+			listener = nonTlsListener
 		}
+
+		mux, err := vhost.NewHTTPMuxer(listener, 30*time.Second)
+		if err != nil {
+			logger.Error("vhost mux creation error", zap.Error(err))
+			return nil
+		}
+		defer mux.Close()
 
 		haikunator := haikunator.New(time.Now().UTC().UnixNano())
 
