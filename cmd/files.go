@@ -49,7 +49,7 @@ var FilesCommand = &cli.Command{
 		}
 
 		if response.StatusCode != http.StatusOK {
-			return cli.Exit(fmt.Sprintf("Unexpected connec reponse status %v", response.StatusCode), 128)
+			return cli.Exit(fmt.Sprintf("Unexpected connect reponse status: %v", response.Status), 128)
 		}
 
 		fmt.Println(response.Header.Get("X-Tunl-Hostname"))
