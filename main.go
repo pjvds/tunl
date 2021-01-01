@@ -19,7 +19,7 @@ func main() {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "host",
-				Value: "http://_.tunl.es",
+				Value: "https://_.tunl.es",
 			},
 		},
 		Version: version,
