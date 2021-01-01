@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.7.0 - 2021-01-01
+
+
+### Features
+
+[e3f582](https://github.com/pjvds/tunl/commit/e3f582b8ca97d6f4274a1b48cb308b918873ff35) - change default host from http to https - [pjvds](https://github.com/pjvds)
+
+
+### Bug Fixes
+
+[4f7289](https://github.com/pjvds/tunl/commit/4f72892cd2014f030dee4a8b22c0458b197e5aeb) - fix wrong mux created when using TLS - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.6.0 - 2021-01-01
 
 
