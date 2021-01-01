@@ -69,7 +69,7 @@ var DaemonCommand = &cli.Command{
 				return nil
 			}
 
-			tlsMux, err := vhost.NewTLSMuxer(tlsListener, 30*time.Second)
+			tlsMux, err := vhost.NewHTTPMuxer(tlsListener, 30*time.Second)
 			if err != nil {
 				logger.Error("vhost tls mux creation error", zap.Error(err))
 				return nil
