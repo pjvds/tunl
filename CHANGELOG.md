@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.6.0 - 2021-01-01
+
+
+### Bug Fixes
+
+[6096a8](https://github.com/pjvds/tunl/commit/6096a8d37cb480748d424461d2fd1a616e5e17a3) - improve fix unexpected response error message and include full status - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[ca793c](https://github.com/pjvds/tunl/commit/ca793c84d24c8514ae3e9005d87135499ef1347b) - add TLS hosting - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.5.0 - 2020-12-31
 
 
