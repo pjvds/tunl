@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.7.3 - 2021-01-01
+
+
+### Bug Fixes
+
+[aded6a](https://github.com/pjvds/tunl/commit/aded6af937f4bbab683c9ada3b9f94d32c5958e4) - dial tls from client when required - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.7.2 - 2021-01-01
 
 
