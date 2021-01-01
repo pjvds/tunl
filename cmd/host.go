@@ -48,7 +48,7 @@ func DialHost(ctx *cli.Context) (net.Conn, string, error) {
 	server := fmt.Sprintf("%s:%v", hostnameWithoutPort, port)
 
 	if hostURL.Scheme == "https" {
-		tlsConn, err := tls.Dial("tcp", server, &tls.Config{})
+		tlsConn, err := tls.Dial("tcp", server, nil)
 		if err != nil {
 			return nil, "", cli.Exit(fmt.Sprintf("Failed to connect to host %s: %v", server, err), 128)
 		}
