@@ -2,6 +2,22 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.8.0 - 2021-01-01
+
+
+### Refactoring
+
+[c39ef5](https://github.com/pjvds/tunl/commit/c39ef5f292ea86ce06b1a7b3abfb2b29315b86d3) - use default tls config from tls package - [pjvds](https://github.com/pjvds)
+
+[4df146](https://github.com/pjvds/tunl/commit/4df146c64fb73e81b3ba5f2d4cae4b95ac404be7) - use a single listener in context - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[67b2a5](https://github.com/pjvds/tunl/commit/67b2a579148839792d78c55d8067ed8645741561) - remove tls muxer - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.7.3 - 2021-01-01
 
 
