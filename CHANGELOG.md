@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.7.2 - 2021-01-01
+
+
+### Bug Fixes
+
+[d56a0a](https://github.com/pjvds/tunl/commit/d56a0a0243b87b25dcaa6f16060fd5ba39504a24) - remove unused listener - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.7.1 - 2021-01-01
 
 
