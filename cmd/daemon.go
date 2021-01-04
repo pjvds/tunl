@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"html/template"
 	"io"
-	"net/url"
 
 	"bufio"
 	"fmt"
@@ -13,14 +12,54 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/hashicorp/yamux"
 	"github.com/inconshreveable/go-vhost"
+	"github.com/rs/xid"
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 	"github.com/yelinaung/go-haikunator"
 	"go.uber.org/zap"
 )
+
+func createToken(signKey string, id string) (string, error) {
+	claims := jwt.StandardClaims{
+		Id:        xid.New().String(),
+		Issuer:    "tunl",
+		Subject:   id,
+		Audience:  "tunnels",
+		ExpiresAt: time.Now().Add(24 * time.Hour).UTC().Unix(),
+		IssuedAt:  time.Now().UTC().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(signKey))
+}
+
+func verifyToken(signKey string, tokenString string) (*jwt.StandardClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(signKey), nil
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "invalid token")
+	}
+
+	claims, ok := token.Claims.(*jwt.StandardClaims)
+	if !ok || !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+
+	if !claims.VerifyExpiresAt(time.Now().UTC().Unix(), false) {
+		return nil, errors.New("token expired")
+	}
+
+	return claims, nil
+}
 
 var DaemonCommand = &cli.Command{
 	Name:   "daemon",
@@ -48,8 +87,18 @@ var DaemonCommand = &cli.Command{
 			Name:  "address-template",
 			Value: "https://{{.Id}}.{{.Domain}}",
 		},
+		&cli.StringFlag{
+			Name:  "sign-key",
+			Value: xid.New().String(),
+		},
 	},
 	Action: func(ctx *cli.Context) error {
+		signKey := ctx.String("sign-key")
+		if len(signKey) == 0 {
+			logger.Error("sign-key cannot be empty")
+			return nil
+		}
+
 		bind := ctx.String("bind")
 		if len(bind) == 0 {
 			logger.Error("bind flag value cannot be empty")
@@ -95,6 +144,8 @@ var DaemonCommand = &cli.Command{
 			listener = nonTlsListener
 		}
 
+		logger.Debug("listener created", zap.String("address", listener.Addr().String()))
+
 		mux, err := vhost.NewHTTPMuxer(listener, 30*time.Second)
 		if err != nil {
 			logger.Error("vhost mux creation error", zap.Error(err))
@@ -132,6 +183,20 @@ var DaemonCommand = &cli.Command{
 				defer conn.Close()
 
 				id := haikunator.Haikunate()
+				if claimedID := request.URL.Query().Get("id"); len(claimedID) > 0 {
+					token := request.Header.Get("X-Tunl-Token")
+
+					claims, err := verifyToken(signKey, token)
+					if err != nil {
+						logger.Debug("invalid token", zap.String("token", token), zap.Error(err))
+						http.Error(response, "invalid token", http.StatusUnauthorized)
+						return
+					}
+
+					id = claims.Subject
+					println("subject: " + id)
+				}
+
 				hostname := id + "." + ctx.String("domain")
 				buffer := bytes.Buffer{}
 
@@ -144,8 +209,13 @@ var DaemonCommand = &cli.Command{
 					return
 				}
 
-				started := time.Now()
+				token, err := createToken(signKey, id)
+				if err != nil {
+					logger.Error("failed to create token", zap.Error(err))
+					http.Error(response, "internal server error", http.StatusInternalServerError)
+				}
 
+				started := time.Now()
 				vhost, err := mux.Listen(hostname)
 				if err != nil {
 					logger.Error("vhost listen error", zap.Error(err))
@@ -156,7 +226,9 @@ var DaemonCommand = &cli.Command{
 				accepted := &http.Response{
 					StatusCode: http.StatusOK,
 					Header: http.Header{
+						"X-Tunl-Id":      []string{id},
 						"X-Tunl-Address": []string{buffer.String()},
+						"X-Tunl-Token":   []string{token},
 					},
 				}
 				if err := accepted.Write(conn); err != nil {
@@ -172,13 +244,7 @@ var DaemonCommand = &cli.Command{
 				}
 				defer session.Close()
 
-				targetURL, err := url.Parse("https://httpstatuses.com")
-				if err != nil {
-					logger.Error("handshake error", zap.Error(err))
-					return
-				}
-
-				logger.Debug("handshake success", zap.String("target-url", targetURL.String()))
+				logger.Debug("handshake success")
 
 				go http.Serve(vhost, http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
 					upstream, err := session.Open()

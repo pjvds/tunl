@@ -4,12 +4,15 @@ import (
 	"bufio"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
+	"time"
 
 	"github.com/gorilla/handlers"
 	"github.com/pjvds/tunl/assets/favicon"
 
 	"github.com/hashicorp/yamux"
+	"github.com/pjvds/backoff"
 	"github.com/urfave/cli/v2"
 )
 
@@ -29,24 +32,40 @@ var FilesCommand = &cli.Command{
 			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 		}
 
+		id := ""
+		token := ""
+		delay := backoff.Exp(1*time.Second, 1*time.Second)
+
+	RECONNECT:
 		conn, hostname, err := DialHost(ctx)
 		if err != nil {
-			return err
+			fmt.Fprintln(os.Stderr, "connect error:", err)
+
+			delay.Delay()
+			goto RECONNECT
 		}
 		defer conn.Close()
 
-		request, _ := http.NewRequest(http.MethodConnect, "/", nil)
+		request, _ := http.NewRequest(http.MethodConnect, "/?id="+url.QueryEscape(id), nil)
 		request.Host = hostname
 		request.Header.Add("X-Tunl-Type", "http")
+		request.Header.Add("X-Tunl-Token", token)
 
 		if err := request.Write(conn); err != nil {
-			return cli.Exit(fmt.Sprintf("Failed to write connect request: %v", err), 128)
+			fmt.Fprintln(os.Stderr, "handshake request error:", err)
+
+			delay.Delay()
+			goto RECONNECT
 		}
 
 		reader := bufio.NewReader(conn)
 		response, err := http.ReadResponse(reader, request)
 		if err != nil {
-			return cli.Exit(fmt.Sprintf("Failed to read connect response: %v", err), 128)
+			fmt.Fprintln(os.Stderr, "handshake response error:", err)
+
+			delay.Delay()
+			goto RECONNECT
+
 		}
 
 		if response.StatusCode != http.StatusOK {
@@ -55,19 +74,34 @@ var FilesCommand = &cli.Command{
 
 		session, err := yamux.Client(conn, nil)
 		if err != nil {
-			return cli.Exit(fmt.Sprintf("Failed to create multiplex client: %v", err), 128)
-		}
-		defer session.Close()
-
-		handler := Fallback(http.FileServer(favicon.AssetFile()), http.FileServer(http.Dir(dir)))
-
-		if ctx.Bool("access-log") {
-			handler = handlers.LoggingHandler(os.Stderr, handler)
+			fmt.Fprintln(os.Stdout, "mux creation error: "+err.Error())
+			delay.Delay()
+			goto RECONNECT
 		}
 
-		fmt.Fprintln(os.Stdout, response.Header.Get("X-Tunl-Address"))
-		if err := http.Serve(session, handler); err != nil {
-			return cli.Exit("fatal: "+err.Error(), 128)
+		err = func() error {
+			defer session.Close()
+			handler := Fallback(http.FileServer(favicon.AssetFile()), http.FileServer(http.Dir(dir)))
+
+			if ctx.Bool("access-log") {
+				handler = handlers.LoggingHandler(os.Stderr, handler)
+			}
+
+			id = response.Header.Get("X-Tunl-Id")
+			token = response.Header.Get("X-Tunl-Token")
+			fmt.Fprintln(os.Stdout, response.Header.Get("X-Tunl-Address"))
+
+			if err := http.Serve(session, handler); err != nil {
+				return err
+			}
+
+			return nil
+		}()
+
+		if err != nil {
+			fmt.Fprintln(os.Stdout, "disconnected: "+err.Error())
+			delay.Delay()
+			goto RECONNECT
 		}
 
 		return nil

@@ -3,11 +3,14 @@ module github.com/pjvds/tunl
 go 1.15
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gorilla/handlers v1.5.1
 	github.com/hashicorp/yamux v0.0.0-20200609203250-aecfd211c9ce
 	github.com/inconshreveable/go-vhost v0.0.0-20160627193104-06d84117953b
 	github.com/kr/pretty v0.2.1 // indirect
+	github.com/pjvds/backoff v0.0.0-20151029185359-615bd1fa5d8a
 	github.com/pkg/errors v0.9.1
+	github.com/rs/xid v1.2.1
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/yelinaung/go-haikunator v0.0.0-20150320004105-1249cae259af
