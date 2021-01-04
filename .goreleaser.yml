@@ -34,11 +34,13 @@ snapcrafts:
     confinement: strict
     license: MIT
     base: bare
-    plugs:
-      network:
-      file-system:
-        read:
-          - /
+    apps:
+      tunl:
+        plugs:
+          network:
+          file-system:
+            read:
+              - /
 
 archives:
   - replacements:
