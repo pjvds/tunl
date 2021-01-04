@@ -2,6 +2,33 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.10.0 - 2021-01-04
+
+
+### Bug Fixes
+
+[e185e6](https://github.com/pjvds/tunl/commit/e185e6bd423929c76226c6c742f75c1dd70d339f) - snap package not requesting correct plugs - [pjvds](https://github.com/pjvds)
+
+
+### Miscellaneous Chores
+
+[2ec95d](https://github.com/pjvds/tunl/commit/2ec95def75f77dd9510f6dd68df7944e6e71a437) - fix .goreleaser format error - [pjvds](https://github.com/pjvds)
+
+[ff7a9b](https://github.com/pjvds/tunl/commit/ff7a9b5588b9a49248691fc666182042144af0a8) - add favicon assets - [pjvds](https://github.com/pjvds)
+
+[1906a9](https://github.com/pjvds/tunl/commit/1906a94a1b8c1afc003816a88da9048ff2db03be) - publish snapcraft package with correct permissions - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[cb5955](https://github.com/pjvds/tunl/commit/cb5955143b2937f4276b6c9ec196fd4f28a7e30c) - switch to distroless image - [pjvds](https://github.com/pjvds)
+
+[95a8d4](https://github.com/pjvds/tunl/commit/95a8d4d110be9a845562030c701b47ca36ce00e6) - tunnel can be reclaimed after disconnect - [pjvds](https://github.com/pjvds)
+
+[1664e0](https://github.com/pjvds/tunl/commit/1664e0e0a284b4c78be0ea25974ce398c63dc370) - serve favicon and meta data if not exists in file server location - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.9.1 - 2021-01-04
 
 
