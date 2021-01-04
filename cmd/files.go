@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/gorilla/handlers"
+	"github.com/pjvds/tunl/assets/favicon"
 
 	"github.com/hashicorp/yamux"
 	"github.com/urfave/cli/v2"
@@ -58,13 +59,13 @@ var FilesCommand = &cli.Command{
 		}
 		defer session.Close()
 
-		handler := http.FileServer(http.Dir(dir))
+		handler := Fallback(http.FileServer(favicon.AssetFile()), http.FileServer(http.Dir(dir)))
 
 		if ctx.Bool("access-log") {
 			handler = handlers.LoggingHandler(os.Stderr, handler)
 		}
 
-		fmt.Println(response.Header.Get("X-Tunl-Address"))
+		fmt.Fprintln(os.Stdout, response.Header.Get("X-Tunl-Address"))
 		if err := http.Serve(session, handler); err != nil {
 			return cli.Exit("fatal: "+err.Error(), 128)
 		}
