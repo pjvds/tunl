@@ -52,8 +52,6 @@ var FilesCommand = &cli.Command{
 			return cli.Exit(fmt.Sprintf("Unexpected connect reponse status: %v", response.Status), 128)
 		}
 
-		fmt.Println(response.Header.Get("X-Tunl-Hostname"))
-
 		session, err := yamux.Client(conn, nil)
 		if err != nil {
 			return cli.Exit(fmt.Sprintf("Failed to create multiplex client: %v", err), 128)
@@ -66,6 +64,7 @@ var FilesCommand = &cli.Command{
 			handler = handlers.LoggingHandler(os.Stderr, handler)
 		}
 
+		fmt.Println(response.Header.Get("X-Tunl-Address"))
 		if err := http.Serve(session, handler); err != nil {
 			return cli.Exit("fatal: "+err.Error(), 128)
 		}

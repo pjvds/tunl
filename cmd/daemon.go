@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"bytes"
 	"crypto/tls"
+	"html/template"
 	"io"
 	"net/url"
 
@@ -42,11 +44,27 @@ var DaemonCommand = &cli.Command{
 			Name:  "domain",
 			Value: "tunl.es",
 		},
+		&cli.StringFlag{
+			Name:  "address-template",
+			Value: "https://{{.Id}}.{{.Domain}}",
+		},
 	},
 	Action: func(ctx *cli.Context) error {
 		bind := ctx.String("bind")
 		if len(bind) == 0 {
 			logger.Error("bind flag value cannot be empty")
+			return nil
+		}
+
+		addressTemplateInput := ctx.String("address-template")
+		if len(addressTemplateInput) == 0 {
+			logger.Error("address-template value cannot be empty")
+			return nil
+		}
+
+		addressTemplate, err := template.New("address-template").Parse(addressTemplateInput)
+		if err != nil {
+			logger.Error("address-template value invalid: " + err.Error())
 			return nil
 		}
 
@@ -113,7 +131,21 @@ var DaemonCommand = &cli.Command{
 				}
 				defer conn.Close()
 
-				hostname := haikunator.Haikunate() + "." + ctx.String("domain")
+				id := haikunator.Haikunate()
+				hostname := id + "." + ctx.String("domain")
+				buffer := bytes.Buffer{}
+
+				if err := addressTemplate.Execute(&buffer, struct {
+					Id     string
+					Domain string
+				}{Id: id, Domain: ctx.String("domain")}); err != nil {
+					logger.Debug("address-template execution error", zap.Error(err))
+					http.Error(response, "internal server error", http.StatusInternalServerError)
+					return
+				}
+
+				started := time.Now()
+
 				vhost, err := mux.Listen(hostname)
 				if err != nil {
 					logger.Error("vhost listen error", zap.Error(err))
@@ -124,7 +156,7 @@ var DaemonCommand = &cli.Command{
 				accepted := &http.Response{
 					StatusCode: http.StatusOK,
 					Header: http.Header{
-						"X-Tunl-Hostname": []string{hostname},
+						"X-Tunl-Address": []string{buffer.String()},
 					},
 				}
 				if err := accepted.Write(conn); err != nil {
@@ -183,6 +215,7 @@ var DaemonCommand = &cli.Command{
 				}))
 
 				<-session.CloseChan()
+				logger.Debug("tunnel closed", zap.String("id", id), zap.Duration("time-online", time.Since(started)))
 			}))
 		}()
 
