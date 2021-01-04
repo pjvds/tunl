@@ -2,6 +2,27 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.9.0 - 2021-01-04
+
+
+### Miscellaneous Chores
+
+[827af9](https://github.com/pjvds/tunl/commit/827af9d1cd62aa77b5666de7871f645f8066602d) - only run release pipeline on new tags - [pjvds](https://github.com/pjvds)
+
+[f0c375](https://github.com/pjvds/tunl/commit/f0c375546416a82021a88f5685690b158888c0b0) - add snapcraft release - [pjvds](https://github.com/pjvds)
+
+
+### Bug Fixes
+
+[cb81f2](https://github.com/pjvds/tunl/commit/cb81f29cef1fd1a6003a7e7e1aba407a4be978c1) - host value error messages not including underlying error - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[e3a3e2](https://github.com/pjvds/tunl/commit/e3a3e2c5b22e1473c8315b2ef57fb2c10432f667) - add tunnel address template support - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.8.0 - 2021-01-01
 
 
