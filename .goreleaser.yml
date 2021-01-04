@@ -23,17 +23,17 @@ dockers:
     - "docker.pkg.github.com/pjvds/tunl/tunl:v{{ .Major }}.{{ .Minor }}"
     extra_files:
 
-snapcrafts:
-  -
-    # ID of the snapcraft config, must be unique.
-    # Defaults to "default".
-    id: tunl
-    summary: Expose your localhost to the public via an secure tunnel
-    description: With Tunl you can expose services on your localhost to the public via a fast and secure tunnel.
-    grade: devel
-    confinement: strict
-    license: MIT
-    base: bare
+      #snapcrafts:
+      #  -
+      #    # ID of the snapcraft config, must be unique.
+      #    # Defaults to "default".
+      #    id: tunl
+      #    summary: Expose your localhost to the public via an secure tunnel
+      #    description: With Tunl you can expose services on your localhost to the public via a fast and secure tunnel.
+      #    grade: devel
+      #    confinement: strict
+      #    license: MIT
+      #    base: bare
 
 archives:
   - replacements:
