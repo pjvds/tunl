@@ -13,7 +13,7 @@ import (
 func DialHost(ctx *cli.Context) (net.Conn, string, error) {
 	host := ctx.String("host")
 	if len(host) == 0 {
-		fmt.Println("Host cannot be empty, see --host flag for more information.\n")
+		fmt.Print("Host cannot be empty\nSee --host flag for more information.\n\n")
 
 		cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 		return nil, "", cli.Exit("Host cannot be empty.", 1)
@@ -21,14 +21,14 @@ func DialHost(ctx *cli.Context) (net.Conn, string, error) {
 
 	hostURL, err := url.Parse(host)
 	if err != nil {
-		fmt.Println("Host value invalid: %v, see --host flag for more information.\n", err)
+		fmt.Printf("Host value invalid: %v\nSee --host flag for more information.\n\n", err)
 
 		cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 	}
 
 	port, err := net.LookupPort("tcp", hostURL.Scheme)
 	if err != nil {
-		fmt.Println("Host scheme value is invalid: %v, see --host flag for more information.\n", err)
+		fmt.Printf("Host scheme value is invalid: %v\nSee --host flag for more information.\n\n", err)
 
 		cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 	}
@@ -39,7 +39,7 @@ func DialHost(ctx *cli.Context) (net.Conn, string, error) {
 
 	hostnameWithoutPort := hostURL.Hostname()
 	if len(hostnameWithoutPort) == 0 {
-		fmt.Println("Host hostname cannot be empty: %v, see --host flag for more information.\n", err)
+		fmt.Print("Host hostname cannot be empty, see --host flag for more information.\n\n")
 
 		cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 	}
