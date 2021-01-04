@@ -36,12 +36,7 @@ snapcrafts:
     base: bare
     apps:
       tunl:
-        plugs:
-          network:
-          file-system:
-            read:
-              - /
-
+        plugs: [ "network", "home", "file-system" ]
 archives:
   - replacements:
       darwin: Darwin
