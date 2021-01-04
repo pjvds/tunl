@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.9.1 - 2021-01-04
+
+
+### Miscellaneous Chores
+
+[4934b3](https://github.com/pjvds/tunl/commit/4934b339e37dc38262f10874f8cdb12237c75276) - add tunl logo - [pjvds](https://github.com/pjvds)
+
+[6cc6ca](https://github.com/pjvds/tunl/commit/6cc6cacff272ac46417429fbb37676be9a5b53f3) - disable snap release - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.9.0 - 2021-01-04
 
 
