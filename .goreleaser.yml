@@ -40,7 +40,7 @@ snapcrafts:
     summary: Expose your localhost to the public
     description: With Tunl you can expose services on your localhost to the public via a fast and secure tunnel.
     grade: devel
-    confinement: strict
+    confinement: devmode
     license: Apache-2.0
     base: bare
     apps:
