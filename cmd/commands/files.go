@@ -95,7 +95,8 @@ var FilesCommand = &cli.Command{
 
 			id = response.Header.Get("X-Tunl-Id")
 			token = response.Header.Get("X-Tunl-Token")
-			fmt.Fprintln(os.Stdout, response.Header.Get("X-Tunl-Address"))
+
+			fmt.Fprintln(os.Stdout, response.Header.Get("X-Tunl-Address"), "->", absDir)
 
 			if err := http.Serve(session, handler); err != nil {
 				return err

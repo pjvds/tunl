@@ -70,7 +70,7 @@ var HttpCommand = &cli.Command{
 			return cli.Exit(fmt.Sprintf("Unexpect connect response status: %v", response.Status), 1)
 		}
 
-		fmt.Println(response.Header.Get("X-Tunl-Address"))
+		fmt.Println(response.Header.Get("X-Tunl-Address"), "->", targetURL)
 
 		session, err := yamux.Client(conn, nil)
 		if err != nil {
