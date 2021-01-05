@@ -20,7 +20,7 @@ func main() {
 				Value: "https://_.tunl.es",
 			},
 		},
-		Usage: "expose local file and services via a public tunnel",
+		Usage: "expose your localhost to the public",
 		Commands: []*cli.Command{
 			commands.DaemonCommand,
 			commands.FilesCommand,
