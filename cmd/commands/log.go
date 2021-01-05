@@ -1,4 +1,4 @@
-package cmd
+package commands
 
 import "go.uber.org/zap"
 

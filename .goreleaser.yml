@@ -2,7 +2,17 @@ before:
   hooks:
     - go mod download
 builds:
-  - env:
+  - 
+    id: tunl
+    main: ./cmd
+    binary: tunl
+    ldflags:
+      - -s
+      - -w
+      - -X github.com/pjvds/tunl/pkg/version.BuildDate={{.Date}}
+      - -X github.com/pjvds/tunl/pkg/version.GitCommit={{.ShortCommit}}
+      - -X github.com/pjvds/tunl/pkg/version.Version={{.Version}}
+    env:
       - CGO_ENABLED=0
     goos:
       - linux

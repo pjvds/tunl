@@ -1,4 +1,4 @@
-package cmd
+package commands
 
 import (
 	"bufio"
@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/pjvds/tunl/assets/favicon"
+	"github.com/pjvds/tunl/pkg/fallback"
 
 	"github.com/hashicorp/yamux"
 	"github.com/pjvds/backoff"
@@ -81,7 +82,7 @@ var FilesCommand = &cli.Command{
 
 		err = func() error {
 			defer session.Close()
-			handler := Fallback(http.FileServer(favicon.AssetFile()), http.FileServer(http.Dir(dir)))
+			handler := fallback.Fallback(http.FileServer(favicon.AssetFile()), http.FileServer(http.Dir(dir)))
 
 			if ctx.Bool("access-log") {
 				handler = handlers.LoggingHandler(os.Stderr, handler)

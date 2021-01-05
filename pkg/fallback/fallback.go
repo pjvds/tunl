@@ -1,4 +1,4 @@
-package cmd
+package fallback
 
 import "net/http"
 

@@ -4,30 +4,27 @@ import (
 	"log"
 	"os"
 
-	"github.com/pjvds/tunl/cmd"
+	"github.com/pjvds/tunl/cmd/commands"
+	"github.com/pjvds/tunl/pkg/version"
 
 	"github.com/urfave/cli/v2"
 )
 
-var (
-	version = "<unknown>"
-)
-
 func main() {
 	app := &cli.App{
-		Name: "tunl",
+		Name:    "tunl",
+		Version: version.String(),
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "host",
 				Value: "https://_.tunl.es",
 			},
 		},
-		Version: version,
-		Usage:   "expose local file and services via a public tunnel",
+		Usage: "expose local file and services via a public tunnel",
 		Commands: []*cli.Command{
-			cmd.DaemonCommand,
-			cmd.FilesCommand,
-			cmd.HttpCommand,
+			commands.DaemonCommand,
+			commands.FilesCommand,
+			commands.HttpCommand,
 		},
 	}
 
