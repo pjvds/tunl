@@ -41,13 +41,19 @@ snapcrafts:
     description: With Tunl you can expose services on your localhost to the public via a fast and secure tunnel.
     grade: devel
     confinement: strict
-    license: MIT
+    license: Apache-2.0
     base: bare
     apps:
       tunl:
         plugs: [ "network", "home", "system-files" ]
 archives:
-  - replacements:
+  - 
+    id: tunl
+    builds:
+      - tunl
+    files: 
+      - LICENSE
+    replacements:
       darwin: Darwin
       linux: Linux
       windows: Windows
