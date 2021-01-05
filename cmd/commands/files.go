@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gorilla/handlers"
@@ -25,12 +26,16 @@ var FilesCommand = &cli.Command{
 			Value: true,
 		},
 	},
-	ArgsUsage: "<dir>",
+	ArgsUsage: "[dir]",
 	Action: func(ctx *cli.Context) error {
 		dir := ctx.Args().First()
 		if len(dir) == 0 {
-			fmt.Println("You must specify the <dir> argument\n")
-			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
+			dir = "."
+		}
+
+		absDir, err := filepath.Abs(dir)
+		if err != nil {
+			return cli.Exit("invalid dir: "+err.Error(), 1)
 		}
 
 		id := ""
@@ -82,7 +87,7 @@ var FilesCommand = &cli.Command{
 
 		err = func() error {
 			defer session.Close()
-			handler := fallback.Fallback(http.FileServer(favicon.AssetFile()), http.FileServer(http.Dir(dir)))
+			handler := fallback.Fallback(http.FileServer(favicon.AssetFile()), http.FileServer(http.Dir(absDir)))
 
 			if ctx.Bool("access-log") {
 				handler = handlers.LoggingHandler(os.Stderr, handler)
