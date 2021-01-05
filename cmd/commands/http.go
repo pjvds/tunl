@@ -7,6 +7,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/hashicorp/yamux"
@@ -28,6 +29,10 @@ var HttpCommand = &cli.Command{
 		if len(target) == 0 {
 			fmt.Println("You must specify the <url> argument\n")
 			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
+		}
+
+		if !strings.Contains(target, "://") {
+			target = "http://" + target
 		}
 
 		parsed, err := url.Parse(target)
