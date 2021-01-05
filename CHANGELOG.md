@@ -2,6 +2,56 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.16.1 - 2021-01-05
+
+
+### Refactoring
+
+[4da164](https://github.com/pjvds/tunl/commit/4da16456b3213fed0f65bff4009d451702f64db7) - split commands and package logic - [pjvds](https://github.com/pjvds)
+
+
+### Miscellaneous Chores
+
+[cd64cc](https://github.com/pjvds/tunl/commit/cd64cc7ad6f6b7e52f4e7aa1dee449446c9e768b) - shorten usage description - [pjvds](https://github.com/pjvds)
+
+[1c6e06](https://github.com/pjvds/tunl/commit/1c6e06928f09ee9460c536475b1a96bc044cb5ae) - use zip archives for windows builds - [pjvds](https://github.com/pjvds)
+
+[836ffe](https://github.com/pjvds/tunl/commit/836ffe1fcafbd3bdb397ca27ebc90348c9355703) - add apache 2.0 license file - [pjvds](https://github.com/pjvds)
+
+[f4965b](https://github.com/pjvds/tunl/commit/f4965b9bdccaa41d120ca53787222624882bd3b9) - remove checksum for unused jwt-go version - [pjvds](https://github.com/pjvds)
+
+[c917ec](https://github.com/pjvds/tunl/commit/c917ec3fbf72d0b6236775a24972308c2896cac5) - change release pipeline to publish releases to snap store - [pjvds](https://github.com/pjvds)
+
+[d33e3f](https://github.com/pjvds/tunl/commit/d33e3fef554a5b05cf645c702d01aca160d1788a) - 0.10.0 - [pjvds](https://github.com/pjvds)
+
+[2ec95d](https://github.com/pjvds/tunl/commit/2ec95def75f77dd9510f6dd68df7944e6e71a437) - fix .goreleaser format error - [pjvds](https://github.com/pjvds)
+
+[ff7a9b](https://github.com/pjvds/tunl/commit/ff7a9b5588b9a49248691fc666182042144af0a8) - add favicon assets - [pjvds](https://github.com/pjvds)
+
+[1906a9](https://github.com/pjvds/tunl/commit/1906a94a1b8c1afc003816a88da9048ff2db03be) - publish snapcraft package with correct permissions - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[d6328c](https://github.com/pjvds/tunl/commit/d6328ca2cb8ea4cb81090dddda7b69545e49d8f3) - prefix target url with schema if not exists - [pjvds](https://github.com/pjvds)
+
+[34126a](https://github.com/pjvds/tunl/commit/34126aa4494207364577c7f1739967ffad67f993) - print tunnel explicitly with tunnel address and - [pjvds](https://github.com/pjvds)
+
+[2942f8](https://github.com/pjvds/tunl/commit/2942f894d3b3a2efa277144dbd8d72b36a09c0bb) - make dir argument optional and validate - [pjvds](https://github.com/pjvds)
+
+[cb5955](https://github.com/pjvds/tunl/commit/cb5955143b2937f4276b6c9ec196fd4f28a7e30c) - switch to distroless image - [pjvds](https://github.com/pjvds)
+
+[95a8d4](https://github.com/pjvds/tunl/commit/95a8d4d110be9a845562030c701b47ca36ce00e6) - tunnel can be reclaimed after disconnect - [pjvds](https://github.com/pjvds)
+
+[1664e0](https://github.com/pjvds/tunl/commit/1664e0e0a284b4c78be0ea25974ce398c63dc370) - serve favicon and meta data if not exists in file server location - [pjvds](https://github.com/pjvds)
+
+
+### Bug Fixes
+
+[e185e6](https://github.com/pjvds/tunl/commit/e185e6bd423929c76226c6c742f75c1dd70d339f) - snap package not requesting correct plugs - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.10.0 - 2021-01-04
 
 
