@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.16.2 - 2021-01-06
+
+### Miscellaneous Chores
+
+[795544](https://github.com/pjvds/tunl/commit/795544985a9770a59013a67355b35693076bad0d) - lower package confinement to devmode - [pjvds](https://github.com/pjvds)
+
+### Refactoring
+
+[b30eb4](https://github.com/pjvds/tunl/commit/b30eb4966ffeb35e578d9546a4c6ada802ff2f64) - move all tunnel and networking logic to own package and - [pjvds](https://github.com/pjvds)
+
+- - -
 ## 0.16.1 - 2021-01-05
 
 
