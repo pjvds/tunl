@@ -1,20 +1,18 @@
 package commands
 
 import (
-	"bufio"
 	"fmt"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/gorilla/handlers"
 	"github.com/pjvds/tunl/assets/favicon"
 	"github.com/pjvds/tunl/pkg/fallback"
+	"github.com/pjvds/tunl/pkg/tunnel"
+	"go.uber.org/zap"
 
-	"github.com/hashicorp/yamux"
-	"github.com/pjvds/backoff"
 	"github.com/urfave/cli/v2"
 )
 
@@ -38,77 +36,51 @@ var FilesCommand = &cli.Command{
 			return cli.Exit("invalid dir: "+err.Error(), 1)
 		}
 
-		id := ""
-		token := ""
-		delay := backoff.Exp(1*time.Second, 1*time.Second)
+		host := ctx.String("host")
+		if len(host) == 0 {
+			fmt.Print("Host cannot be empty\nSee --host flag for more information.\n\n")
 
-	RECONNECT:
-		conn, hostname, err := DialHost(ctx)
+			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
+			return cli.Exit("Host cannot be empty.", 1)
+		}
+
+		hostURL, err := url.Parse(host)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "connect error:", err)
+			fmt.Printf("Host value invalid: %v\nSee --host flag for more information.\n\n", err)
 
-			delay.Delay()
-			goto RECONNECT
-		}
-		defer conn.Close()
-
-		request, _ := http.NewRequest(http.MethodConnect, "/?id="+url.QueryEscape(id), nil)
-		request.Host = hostname
-		request.Header.Add("X-Tunl-Type", "http")
-		request.Header.Add("X-Tunl-Token", token)
-
-		if err := request.Write(conn); err != nil {
-			fmt.Fprintln(os.Stderr, "handshake request error:", err)
-
-			delay.Delay()
-			goto RECONNECT
-		}
-
-		reader := bufio.NewReader(conn)
-		response, err := http.ReadResponse(reader, request)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "handshake response error:", err)
-
-			delay.Delay()
-			goto RECONNECT
-
-		}
-
-		if response.StatusCode != http.StatusOK {
-			return cli.Exit(fmt.Sprintf("Unexpected connect reponse status: %v", response.Status), 128)
-		}
-
-		session, err := yamux.Client(conn, nil)
-		if err != nil {
-			fmt.Fprintln(os.Stdout, "mux creation error: "+err.Error())
-			delay.Delay()
-			goto RECONNECT
-		}
-
-		err = func() error {
-			defer session.Close()
-			handler := fallback.Fallback(http.FileServer(favicon.AssetFile()), http.FileServer(http.Dir(absDir)))
-
-			if ctx.Bool("access-log") {
-				handler = handlers.LoggingHandler(os.Stderr, handler)
-			}
-
-			id = response.Header.Get("X-Tunl-Id")
-			token = response.Header.Get("X-Tunl-Token")
-
-			fmt.Fprintln(os.Stdout, response.Header.Get("X-Tunl-Address"), "->", absDir)
-
-			if err := http.Serve(session, handler); err != nil {
-				return err
-			}
-
+			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 			return nil
+		}
+
+		hostnameWithoutPort := hostURL.Hostname()
+		if len(hostnameWithoutPort) == 0 {
+			fmt.Print("Host hostname cannot be empty, see --host flag for more information.\n\n")
+
+			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
+			return nil
+		}
+
+		tunnel, err := tunnel.Open(ctx.Context, zap.NewNop(), hostURL)
+		if err != nil {
+			return cli.Exit(err.Error(), 18)
+		}
+
+		handler := fallback.Fallback(http.FileServer(favicon.AssetFile()), http.FileServer(http.Dir(absDir)))
+
+		if ctx.Bool("access-log") {
+			handler = handlers.LoggingHandler(os.Stderr, handler)
+		}
+
+		fmt.Fprintln(os.Stdout, tunnel.Address(), "->", absDir)
+
+		go func() {
+			for state := range tunnel.StateChanges() {
+				println(state)
+			}
 		}()
 
-		if err != nil {
-			fmt.Fprintln(os.Stdout, "disconnected: "+err.Error())
-			delay.Delay()
-			goto RECONNECT
+		if err := http.Serve(tunnel, handler); err != nil {
+			return err
 		}
 
 		return nil

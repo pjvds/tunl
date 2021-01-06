@@ -184,6 +184,7 @@ var DaemonCommand = &cli.Command{
 
 				id := haikunator.Haikunate()
 				if claimedID := request.URL.Query().Get("id"); len(claimedID) > 0 {
+					logger.Debug("validating claim for tunnel", zap.String("id", claimedID))
 					token := request.Header.Get("X-Tunl-Token")
 
 					claims, err := verifyToken(signKey, token)
@@ -193,8 +194,8 @@ var DaemonCommand = &cli.Command{
 						return
 					}
 
+					logger.Debug("claim valid", zap.String("id", claimedID))
 					id = claims.Subject
-					println("subject: " + id)
 				}
 
 				hostname := id + "." + ctx.String("domain")
