@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"bufio"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
@@ -10,8 +9,9 @@ import (
 	"strings"
 
 	"github.com/gorilla/handlers"
-	"github.com/hashicorp/yamux"
+	"github.com/pjvds/tunl/pkg/tunnel"
 	"github.com/urfave/cli/v2"
+	"go.uber.org/zap"
 )
 
 var HttpCommand = &cli.Command{
@@ -50,42 +50,38 @@ var HttpCommand = &cli.Command{
 			request.Host = targetURL.Host
 		}
 
-		conn, hostname, err := DialHost(ctx)
-		if err != nil {
-			return err
-		}
-		defer conn.Close()
+		host := ctx.String("host")
+		if len(host) == 0 {
+			fmt.Print("Host cannot be empty\nSee --host flag for more information.\n\n")
 
-		request, _ := http.NewRequest(http.MethodConnect, "/", nil)
-		request.Host = hostname
-		request.Header.Add("X-Tunl", targetURL.String())
-
-		if err := request.Write(conn); err != nil {
-			return cli.Exit(fmt.Sprintf("Failed to write connect request: %v", err), 1)
+			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
+			return cli.Exit("Host cannot be empty.", 1)
 		}
 
-		reader := bufio.NewReader(conn)
-		response, err := http.ReadResponse(reader, request)
+		hostURL, err := url.Parse(host)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
+			fmt.Printf("Host value invalid: %v\nSee --host flag for more information.\n\n", err)
+
+			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 			return nil
 		}
 
-		if response.StatusCode != http.StatusOK {
-			return cli.Exit(fmt.Sprintf("Unexpect connect response status: %v", response.Status), 1)
+		hostnameWithoutPort := hostURL.Hostname()
+		if len(hostnameWithoutPort) == 0 {
+			fmt.Print("Host hostname cannot be empty, see --host flag for more information.\n\n")
+
+			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
+			return nil
 		}
 
-		fmt.Println(response.Header.Get("X-Tunl-Address"), "->", targetURL)
-
-		session, err := yamux.Client(conn, nil)
+		tunnel, err := tunnel.Open(ctx.Context, zap.NewNop(), hostURL)
 		if err != nil {
-			return cli.Exit(fmt.Sprintf("Failed to create multiplex client: %v", err), 1)
+			return cli.Exit(err.Error(), 18)
 		}
-		defer session.Close()
 
 		handler := handlers.LoggingHandler(os.Stdout, proxy)
 
-		if err := http.Serve(session, handler); err != nil {
+		if err := http.Serve(tunnel, handler); err != nil {
 			return cli.Exit("fatal error: "+err.Error(), 1)
 		}
 
