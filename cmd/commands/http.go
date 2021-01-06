@@ -27,7 +27,7 @@ var HttpCommand = &cli.Command{
 		var targetURL *url.URL
 		target := ctx.Args().First()
 		if len(target) == 0 {
-			fmt.Println("You must specify the <url> argument\n")
+			fmt.Fprint(os.Stderr, "You must specify the <url> argument\n\n")
 			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 		}
 
@@ -37,7 +37,7 @@ var HttpCommand = &cli.Command{
 
 		parsed, err := url.Parse(target)
 		if err != nil {
-			fmt.Printf("Invalid <url> argument value: %v\n\n", err)
+			fmt.Fprintf(os.Stderr, "Invalid <url> argument value: %v\n\n", err)
 			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 		}
 		targetURL = parsed
@@ -52,7 +52,7 @@ var HttpCommand = &cli.Command{
 
 		host := ctx.String("host")
 		if len(host) == 0 {
-			fmt.Print("Host cannot be empty\nSee --host flag for more information.\n\n")
+			fmt.Fprint(os.Stderr, "Host cannot be empty\nSee --host flag for more information.\n\n")
 
 			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 			return cli.Exit("Host cannot be empty.", 1)
@@ -60,7 +60,7 @@ var HttpCommand = &cli.Command{
 
 		hostURL, err := url.Parse(host)
 		if err != nil {
-			fmt.Printf("Host value invalid: %v\nSee --host flag for more information.\n\n", err)
+			fmt.Fprintf(os.Stderr, "Host value invalid: %v\nSee --host flag for more information.\n\n", err)
 
 			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 			return nil
@@ -68,7 +68,7 @@ var HttpCommand = &cli.Command{
 
 		hostnameWithoutPort := hostURL.Hostname()
 		if len(hostnameWithoutPort) == 0 {
-			fmt.Print("Host hostname cannot be empty, see --host flag for more information.\n\n")
+			fmt.Fprintf(os.Stderr, "Host hostname cannot be empty, see --host flag for more information.\n\n")
 
 			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
 			return nil
