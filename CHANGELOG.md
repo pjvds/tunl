@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.17.2 - 2021-01-07
+
+
+### Bug Fixes
+
+[331a30](https://github.com/pjvds/tunl/commit/331a30a4bca481be2d4650a42dcbb15309373cac) - missing newline character in tunnel address printing - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.17.1 - 2021-01-07
 
 
