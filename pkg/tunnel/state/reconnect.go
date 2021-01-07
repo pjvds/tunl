@@ -14,6 +14,7 @@ type ReconnectCreator interface {
 
 type Reconnect struct {
 	Server  client.ServerInfo
+	Type    client.TunnelType
 	Token   client.TokenRefresher
 	Tunnel  client.TunnelInfo
 	Attempt int
@@ -29,7 +30,7 @@ func (s *Reconnect) Run(ctx context.Context, log *zap.Logger) (State, error) {
 		return s.Reconnect(s.Attempt + 1)
 	}
 
-	info, err := client.Handshake(conn, s.Server.ControlHostname, &s.Tunnel)
+	info, err := client.Handshake(conn, s.Server.ControlHostname, &s.Tunnel, s.Type)
 	if err != nil {
 		time.Sleep(5 * time.Second)
 		return s.Reconnect(s.Attempt + 1)

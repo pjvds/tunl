@@ -60,7 +60,7 @@ var FilesCommand = &cli.Command{
 			return nil
 		}
 
-		tunnel, err := tunnel.Open(ctx.Context, zap.NewNop(), hostURL)
+		tunnel, err := tunnel.OpenHTTP(ctx.Context, zap.NewNop(), hostURL)
 		if err != nil {
 			return cli.Exit(err.Error(), 18)
 		}

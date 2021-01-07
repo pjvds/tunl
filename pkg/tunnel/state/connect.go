@@ -13,6 +13,7 @@ type ConnectCreator interface {
 
 type Connect struct {
 	Server client.ServerInfo
+	Type   client.TunnelType
 
 	client.TunnelInfoSetter
 	RunningCreator
@@ -24,7 +25,7 @@ func (s *Connect) Run(ctx context.Context, log *zap.Logger) (State, error) {
 		return nil, err
 	}
 
-	info, err := client.Handshake(conn, s.Server.ControlHostname, nil)
+	info, err := client.Handshake(conn, s.Server.ControlHostname, nil, s.Type)
 	if err != nil {
 		return nil, err
 	}

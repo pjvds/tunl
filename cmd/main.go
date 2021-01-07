@@ -25,6 +25,7 @@ func main() {
 			commands.DaemonCommand,
 			commands.FilesCommand,
 			commands.HttpCommand,
+			commands.TcpCommand,
 		},
 	}
 

@@ -182,6 +182,70 @@ var DaemonCommand = &cli.Command{
 				}
 				defer conn.Close()
 
+				if request.Header.Get("X-Tunl-Type") == "tcp" {
+					id := xid.New().String()
+					logger.Debug("negociating tcp tunnel")
+
+					tunnelLog := logger.With(zap.String("tunnel-id", id))
+
+					vhost, err := net.Listen("tcp", ":0")
+					if err != nil {
+						tunnelLog.Debug("tcp listen error", zap.Error(err))
+						http.Error(response, "invalid token", http.StatusUnauthorized)
+						return
+					}
+					defer vhost.Close()
+
+					_, port, err := net.SplitHostPort(vhost.Addr().String())
+					if err != nil {
+						tunnelLog.Debug("cannot get port from vhost address", zap.String("addr", vhost.Addr().String()), zap.Error(err))
+						http.Error(response, "invalid token", http.StatusUnauthorized)
+						return
+					}
+
+					address := fmt.Sprintf("%s:%s", ctx.String("domain"), port)
+
+					accepted := &http.Response{
+						StatusCode: http.StatusOK,
+						Header: http.Header{
+							"X-Tunl-Address": []string{address},
+						},
+					}
+					if err := accepted.Write(conn); err != nil {
+						logger.Error("failed to accept control stream", zap.Error(err))
+						return
+					}
+
+					session, err := yamux.Server(conn, nil)
+					if err != nil {
+						logger.Debug("mux server creation error", zap.Error(err))
+						http.Error(response, "internal server error", http.StatusInternalServerError)
+						return
+					}
+					defer session.Close()
+
+					for {
+						accepted, err := vhost.Accept()
+						if err != nil {
+							break
+						}
+
+						go func(accepted net.Conn) {
+							tunnelLog.Debug("accepted " + accepted.RemoteAddr().String())
+							target, err := session.Open()
+							if err != nil {
+								return
+							}
+
+							go io.Copy(accepted, target)
+							go io.Copy(target, accepted)
+						}(accepted)
+					}
+
+					logger.Debug("tcp tunnel closed", zap.String("address", address))
+					return
+				}
+
 				id := haikunator.Haikunate()
 				if claimedID := request.URL.Query().Get("id"); len(claimedID) > 0 {
 					logger.Debug("validating claim for tunnel", zap.String("id", claimedID))

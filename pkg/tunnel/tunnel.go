@@ -75,6 +75,7 @@ func (t *tunnel) Accept() (net.Conn, error) {
 
 type tunnel struct {
 	log     *zap.Logger
+	t       client.TunnelType
 	host    *url.URL
 	server  client.ServerInfo
 	conn    net.Conn
@@ -93,6 +94,7 @@ type tunnel struct {
 func (t *tunnel) Reconnect(attempt int) (*state.Reconnect, error) {
 	return &state.Reconnect{
 		Server: t.server,
+		Type:   t.t,
 		Token:  t,
 		Tunnel: client.TunnelInfo{
 			Id:      t.id,
@@ -109,7 +111,15 @@ func (t *tunnel) StateChanges() <-chan string {
 	return t.changes
 }
 
-func Open(ctx context.Context, log *zap.Logger, host *url.URL) (Tunnel, error) {
+func OpenTCP(ctx context.Context, log *zap.Logger, host *url.URL) (Tunnel, error) {
+	return open(ctx, log, host, client.TypeTCP)
+}
+
+func OpenHTTP(ctx context.Context, log *zap.Logger, host *url.URL) (Tunnel, error) {
+	return open(ctx, log, host, client.TypeHTTP)
+}
+
+func open(ctx context.Context, log *zap.Logger, host *url.URL, t client.TunnelType) (Tunnel, error) {
 	server, err := client.ParseHostURL(host)
 	if err != nil {
 		return nil, err
@@ -129,6 +139,7 @@ func Open(ctx context.Context, log *zap.Logger, host *url.URL) (Tunnel, error) {
 
 	connect := &state.Connect{
 		Server:           server,
+		Type:             t,
 		TunnelInfoSetter: tunnel,
 		RunningCreator:   tunnel,
 	}

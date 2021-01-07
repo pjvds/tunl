@@ -2,52 +2,31 @@ package commands
 
 import (
 	"fmt"
-	"net/http"
-	"net/http/httputil"
+	"io"
+	"net"
 	"net/url"
 	"os"
-	"strings"
+	"sync"
 
-	"github.com/gorilla/handlers"
 	"github.com/pjvds/tunl/pkg/tunnel"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 )
 
-var HttpCommand = &cli.Command{
-	Name: "http",
+var TcpCommand = &cli.Command{
+	Name: "tcp",
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
 			Name:  "access-log",
 			Value: true,
 		},
 	},
-	ArgsUsage: "<url>",
+	ArgsUsage: "<host:port>",
 	Action: func(ctx *cli.Context) error {
-		var targetURL *url.URL
 		target := ctx.Args().First()
 		if len(target) == 0 {
 			fmt.Fprint(os.Stderr, "You must specify the <url> argument\n\n")
 			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
-		}
-
-		if !strings.Contains(target, "://") {
-			target = "http://" + target
-		}
-
-		parsed, err := url.Parse(target)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Invalid <url> argument value: %v\n\n", err)
-			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
-		}
-		targetURL = parsed
-
-		proxy := httputil.NewSingleHostReverseProxy(targetURL)
-		originalDirector := proxy.Director
-
-		proxy.Director = func(request *http.Request) {
-			originalDirector(request)
-			request.Host = targetURL.Host
 		}
 
 		host := ctx.String("host")
@@ -74,17 +53,45 @@ var HttpCommand = &cli.Command{
 			return nil
 		}
 
-		tunnel, err := tunnel.OpenHTTP(ctx.Context, zap.NewNop(), hostURL)
+		tunnel, err := tunnel.OpenTCP(ctx.Context, zap.NewNop(), hostURL)
 		if err != nil {
 			return cli.Exit(err.Error(), 18)
 		}
 
-		handler := handlers.LoggingHandler(os.Stdout, proxy)
+		fmt.Printf("%s -> %s\n", tunnel.Address(), ctx.Args().First())
 
-		if err := http.Serve(tunnel, handler); err != nil {
-			return cli.Exit("fatal error: "+err.Error(), 1)
+		for {
+			conn, err := tunnel.Accept()
+			if err != nil {
+				return cli.Exit("fatal error: "+err.Error(), 1)
+			}
+
+			fmt.Println(conn.RemoteAddr())
+
+			go func(conn net.Conn) {
+				defer conn.Close()
+
+				target, err := net.Dial("tcp", ctx.Args().First())
+				if err != nil {
+					println(err.Error())
+					return
+				}
+
+				var work sync.WaitGroup
+				work.Add(2)
+
+				go func() {
+					defer work.Done()
+					io.Copy(conn, target)
+				}()
+
+				go func() {
+					defer work.Done()
+					io.Copy(target, conn)
+				}()
+
+				work.Wait()
+			}(conn)
 		}
-
-		return nil
 	},
 }

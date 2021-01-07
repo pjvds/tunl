@@ -18,13 +18,14 @@ type TunnelInfoSetter interface {
 	SetTunnelInfo(info TunnelInfo)
 }
 
-func Handshake(conn net.Conn, hostname string, tunnel *TunnelInfo) (TunnelInfo, error) {
+func Handshake(conn net.Conn, hostname string, tunnel *TunnelInfo, t TunnelType) (TunnelInfo, error) {
 	url := "/"
 	if tunnel != nil && len(tunnel.Id) > 0 {
 		url += "?id=" + tunnel.Id
 	}
 
 	request, _ := http.NewRequest(http.MethodConnect, url, nil)
+	t.AddHeaders(request)
 
 	// this hostname is used to redirect this request to the control mux (e.q.: _.tunl.es)
 	request.Host = hostname
