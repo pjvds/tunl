@@ -15,6 +15,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/hashicorp/yamux"
 	"github.com/inconshreveable/go-vhost"
+	"github.com/pjvds/tunl/pkg/tunnel/certs"
 	"github.com/rs/xid"
 
 	"github.com/pkg/errors"
@@ -69,11 +70,8 @@ var DaemonCommand = &cli.Command{
 			Name:  "bind",
 			Value: ":8080",
 		},
-		&cli.StringFlag{
-			Name: "tls-cert-file",
-		},
-		&cli.StringFlag{
-			Name: "tls-key-file",
+		&cli.StringSliceFlag{
+			Name: "tls-certs",
 		},
 		&cli.StringFlag{
 			Name:  "control",
@@ -118,17 +116,15 @@ var DaemonCommand = &cli.Command{
 		}
 
 		var listener net.Listener
-		if certFile := ctx.String("tls-cert-file"); len(certFile) > 0 {
-			keyFile := ctx.String("tls-key-file")
-
-			cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+		if certGlobs := ctx.StringSlice("tls-certs"); len(certGlobs) > 0 {
+			certs, err := certs.LoadCertificates(certGlobs)
 			if err != nil {
-				logger.Error("load certificate error", zap.Error(err), zap.String("cert", certFile), zap.String("key", keyFile))
+				logger.Error("load certificate error", zap.Error(err), zap.Strings("certs", certGlobs))
 				return nil
 			}
 
 			tlsListener, err := tls.Listen("tcp", bind, &tls.Config{
-				Certificates: []tls.Certificate{cert},
+				Certificates: certs,
 			})
 			if err != nil {
 				logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
