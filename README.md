@@ -2,7 +2,7 @@
 
 With Tunl you can expose services on your localhost to the public via a fast and secure tunnel.
 
-## Having a web process running at localhost:3000 and want to demo it to someone at another machine?
+## Want to share a local http process running at localhost:3000?
 
 ```
 $ tunl http localhost:3000
