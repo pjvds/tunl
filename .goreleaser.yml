@@ -18,6 +18,11 @@ builds:
       - linux
       - windows
       - darwin
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
 dockers:
   -
     goos: linux
