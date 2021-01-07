@@ -2,6 +2,25 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.17.0 - 2021-01-07
+
+
+### Features
+
+[a3059c](https://github.com/pjvds/tunl/commit/a3059c407d1d4ade77a6dfc8d331bf00f0d68fa8) - support raw TCP tunnel - [pjvds](https://github.com/pjvds)
+
+[d12de6](https://github.com/pjvds/tunl/commit/d12de6f98ff2fdf0b5231e2a4def08edea1b89de) - support and release binaries for arm and arm64 architecture - [pjvds](https://github.com/pjvds)
+
+[4ec500](https://github.com/pjvds/tunl/commit/4ec5007c3b9f045eba775f55e09b8f9efc8f186e) - all command input errors are written to stderr instread of - [pjvds](https://github.com/pjvds)
+
+[324a99](https://github.com/pjvds/tunl/commit/324a9912c5565a1f29314bca3b2218a9c9771636) - reconnect tunnel when connection get interupted - [pjvds](https://github.com/pjvds)
+
+### Bug Fixes
+
+[e185e6](https://github.com/pjvds/tunl/commit/e185e6bd423929c76226c6c742f75c1dd70d339f) - snap package not requesting correct plugs - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.16.2 - 2021-01-06
 
 ### Miscellaneous Chores
