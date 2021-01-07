@@ -38,3 +38,11 @@ yay tunl
 ```
 sudo snap install tunl --edge
 ```
+
+## Docker
+
+```
+docker run --rm --network=host -v $PWD:$PWD tunl/tunl
+```
+
+**warning**: this maps the current working directory and means files outside the current working directory cannot be shared
