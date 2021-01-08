@@ -200,7 +200,7 @@ var DaemonCommand = &cli.Command{
 						return
 					}
 
-					address := fmt.Sprintf("%s:%s", ctx.String("domain"), port)
+					address := fmt.Sprintf("tcp.%s:%s", ctx.String("domain"), port)
 
 					accepted := &http.Response{
 						StatusCode: http.StatusOK,
