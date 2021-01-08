@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"html/template"
 	"io"
+	"sync"
 
 	"bufio"
 	"fmt"
@@ -232,9 +233,22 @@ var DaemonCommand = &cli.Command{
 							if err != nil {
 								return
 							}
+							defer target.Close()
 
-							go io.Copy(accepted, target)
-							go io.Copy(target, accepted)
+							var work sync.WaitGroup
+							work.Add(2)
+
+							go func() {
+								defer work.Done()
+								io.Copy(accepted, target)
+							}()
+
+							go func() {
+								defer work.Done()
+								io.Copy(target, accepted)
+							}()
+
+							work.Wait()
 						}(accepted)
 					}
 
