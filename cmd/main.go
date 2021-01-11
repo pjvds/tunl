@@ -12,8 +12,9 @@ import (
 
 func main() {
 	app := &cli.App{
-		Name:    "tunl",
-		Version: version.String(),
+		Name:                 "tunl",
+		Version:              version.String(),
+		EnableBashCompletion: true,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "host",
