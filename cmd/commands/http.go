@@ -23,6 +23,7 @@ var HttpCommand = &cli.Command{
 		},
 	},
 	ArgsUsage: "<url>",
+	Usage:     "Create a HTTP tunnel",
 	Action: func(ctx *cli.Context) error {
 		var targetURL *url.URL
 		target := ctx.Args().First()

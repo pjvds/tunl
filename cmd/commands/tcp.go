@@ -21,6 +21,7 @@ var TcpCommand = &cli.Command{
 			Value: true,
 		},
 	},
+	Usage:     "Create a TCP tunnel",
 	ArgsUsage: "<host:port>",
 	Action: func(ctx *cli.Context) error {
 		target := ctx.Args().First()
