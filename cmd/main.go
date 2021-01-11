@@ -23,6 +23,7 @@ func main() {
 		},
 		Usage: "expose your localhost to the public",
 		Commands: []*cli.Command{
+			commands.DockerCommand,
 			commands.DaemonCommand,
 			commands.FilesCommand,
 			commands.HttpCommand,
