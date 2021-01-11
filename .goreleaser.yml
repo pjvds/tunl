@@ -57,6 +57,7 @@ archives:
     builds:
       - tunl
     files: 
+      - autocomplete
       - LICENSE
     replacements:
       darwin: Darwin

@@ -2,6 +2,32 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.19.0 - 2021-01-11
+
+
+### Documentation
+
+[b120e7](https://github.com/pjvds/tunl/commit/b120e7fbd6ceeecf3d953de6077f7f4ffc2d06cb) - shorting example headings - [pjvds](https://github.com/pjvds)
+
+
+### Bug Fixes
+
+[6e2069](https://github.com/pjvds/tunl/commit/6e2069ae6f3becaea5b088971c4909b891bb49d3) - explicitly close target connection when proxy is done - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[2fa41d](https://github.com/pjvds/tunl/commit/2fa41d0b8775752b1fc5000a5a2b67e7db553b95) - add docker command to create tunnel directly to a docker container - [pjvds](https://github.com/pjvds)
+
+[d3adac](https://github.com/pjvds/tunl/commit/d3adacd0d713ba9c15d51a626386d6a6acef83ab) - add usage text to commands definition - [pjvds](https://github.com/pjvds)
+
+[a4323b](https://github.com/pjvds/tunl/commit/a4323b71be4146b05687b5e68848fff0e1191f4f) - add bash and zsh auto completion - [pjvds](https://github.com/pjvds)
+
+[3dbbf3](https://github.com/pjvds/tunl/commit/3dbbf3996e3619cc06a38a08964ff345bebdbd49) - host tcp tunnel on tcp subdomain - [pjvds](https://github.com/pjvds)
+
+
+
+- - -
 ## 0.18.0 - 2021-01-07
 
 
