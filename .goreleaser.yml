@@ -58,7 +58,7 @@ archives:
       - tunl
     files: 
       - LICENSE
-      - autocomplete
+      - autocomplete/**/*
     replacements:
       darwin: Darwin
       linux: Linux
