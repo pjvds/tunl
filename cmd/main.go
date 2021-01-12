@@ -13,15 +13,17 @@ import (
 func main() {
 	app := &cli.App{
 		Name:                 "tunl",
+		HelpName:             "tunl",
 		Version:              version.String(),
 		EnableBashCompletion: true,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:  "host",
-				Value: "https://_.tunl.es",
+				Name:   "host",
+				Value:  "https://_.tunl.es",
+				Hidden: true,
 			},
 		},
-		Usage: "expose your localhost to the public",
+		Usage: "public addresses for local services",
 		Commands: []*cli.Command{
 			commands.DockerCommand,
 			commands.DaemonCommand,
