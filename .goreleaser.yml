@@ -50,7 +50,8 @@ snapcrafts:
     base: bare
     apps:
       tunl:
-        plugs: [ "network", "home", "system-files" ]
+        plugs: 
+        - network
 archives:
   - 
     id: tunl
