@@ -30,13 +30,13 @@ Download a prebuild release and put it somewhere in your `$PATH`.
 ## Basic (curl)
 
 ```
-curl -fsSL http://get.tunl.es | sh
+curl -fsSL https://get.tunl.es | sh
 ```
 
 ## Basic (wget)
 
 ```
-wget -qO- http://get.tunl.es | sh
+wget -qO- https://get.tunl.es | sh
 ```
 
 ## Arch Linux
