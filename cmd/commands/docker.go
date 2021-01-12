@@ -123,7 +123,7 @@ var DockerCommand = &cli.Command{
 		for {
 			conn, err := tunnel.Accept()
 			if err != nil {
-				return cli.Exit("fatal error: "+err.Error(), 1)
+				return cli.Exit("accept error: "+err.Error(), 1)
 			}
 
 			fmt.Println(conn.RemoteAddr())
