@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.19.2 - 2021-01-12
+
+
+### Bug Fixes
+
+[36a202](https://github.com/pjvds/tunl/commit/36a202abb11e18e8fee586f0a3a27ea3667dd6ed) - autocomplete files not included in archives - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.19.1 - 2021-01-11
 
 
