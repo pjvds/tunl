@@ -29,7 +29,7 @@ func (s *Running) Run(ctx context.Context, log *zap.Logger) (State, error) {
 	defer session.Close()
 
 	for {
-		stream, err := session.Accept()
+		stream, err := session.AcceptStream()
 		if err != nil {
 			log.Debug("session accept error", zap.Error(err))
 			return s.Disconnected(err)

@@ -5,7 +5,6 @@ import (
 	"net"
 	"net/url"
 
-	"github.com/hashicorp/yamux"
 	"github.com/pjvds/tunl/pkg/tunnel/client"
 	"github.com/pjvds/tunl/pkg/tunnel/state"
 	"github.com/pkg/errors"
@@ -57,7 +56,7 @@ func (t *tunnel) Close() error {
 }
 
 func (t *tunnel) Addr() net.Addr {
-	return t.session.Addr()
+	return nil
 }
 
 func (t *tunnel) Address() string {
@@ -85,7 +84,6 @@ type tunnel struct {
 	token    string
 	address  string
 	accepted chan net.Conn
-	session  *yamux.Session
 	err      error
 	done     chan struct{}
 	ctx      context.Context
@@ -135,6 +133,7 @@ func open(ctx context.Context, log *zap.Logger, host *url.URL, t client.TunnelTy
 		accepted: accepted,
 		done:     done,
 		changes:  changes,
+		t:        t,
 	}
 
 	connect := &state.Connect{

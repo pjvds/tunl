@@ -1,13 +1,10 @@
 package commands
 
 import (
-	"bytes"
 	"crypto/tls"
-	"html/template"
 	"io"
 	"sync"
 
-	"bufio"
 	"fmt"
 	"net"
 	"net/http"
@@ -17,11 +14,11 @@ import (
 	"github.com/hashicorp/yamux"
 	"github.com/inconshreveable/go-vhost"
 	"github.com/pjvds/tunl/pkg/tunnel/certs"
+	"github.com/pjvds/tunl/pkg/tunnel/server"
 	"github.com/rs/xid"
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
-	"github.com/yelinaung/go-haikunator"
 	"go.uber.org/zap"
 )
 
@@ -104,18 +101,6 @@ var DaemonCommand = &cli.Command{
 			return nil
 		}
 
-		addressTemplateInput := ctx.String("address-template")
-		if len(addressTemplateInput) == 0 {
-			logger.Error("address-template value cannot be empty")
-			return nil
-		}
-
-		addressTemplate, err := template.New("address-template").Parse(addressTemplateInput)
-		if err != nil {
-			logger.Error("address-template value invalid: " + err.Error())
-			return nil
-		}
-
 		var listener net.Listener
 		if certGlobs := ctx.StringSlice("tls-certs"); len(certGlobs) > 0 {
 			certs, err := certs.LoadCertificates(certGlobs)
@@ -150,7 +135,7 @@ var DaemonCommand = &cli.Command{
 		}
 		defer mux.Close()
 
-		haikunator := haikunator.New(time.Now().UTC().UnixNano())
+		addresses := server.NewAddresses(logger, ctx.String("domain"), mux)
 
 		failed := make(chan error)
 
@@ -179,198 +164,128 @@ var DaemonCommand = &cli.Command{
 				}
 				defer conn.Close()
 
-				if request.Header.Get("X-Tunl-Type") == "tcp" {
-					id := xid.New().String()
-					logger.Debug("negociating tcp tunnel")
+				tunlType := request.Header.Get("X-Tunl-Type")
+				tunlToken := request.Header.Get("X-Tunl-Token")
 
-					tunnelLog := logger.With(zap.String("tunnel-id", id))
+				var address *server.PublicAddress
 
-					vhost, err := net.Listen("tcp", ":0")
+				if len(tunlToken) > 0 {
+					token, err := verifyToken(signKey, tunlToken)
 					if err != nil {
-						tunnelLog.Debug("tcp listen error", zap.Error(err))
-						http.Error(response, "invalid token", http.StatusUnauthorized)
+						http.Error(response, err.Error(), http.StatusInternalServerError)
 						return
 					}
-					defer vhost.Close()
 
-					_, port, err := net.SplitHostPort(vhost.Addr().String())
+					address, err = addresses.ClaimAddress(tunlType, token.Subject)
 					if err != nil {
-						tunnelLog.Debug("cannot get port from vhost address", zap.String("addr", vhost.Addr().String()), zap.Error(err))
-						http.Error(response, "invalid token", http.StatusUnauthorized)
+						http.Error(response, err.Error(), http.StatusInternalServerError)
 						return
 					}
 
-					address := fmt.Sprintf("tcp.%s:%s", ctx.String("domain"), port)
-
-					accepted := &http.Response{
-						StatusCode: http.StatusOK,
-						Header: http.Header{
-							"X-Tunl-Address": []string{address},
-						},
-					}
-					if err := accepted.Write(conn); err != nil {
-						logger.Error("failed to accept control stream", zap.Error(err))
-						return
-					}
-
-					session, err := yamux.Server(conn, nil)
+				} else {
+					var err error
+					address, err = addresses.NewAddress(tunlType)
 					if err != nil {
-						logger.Debug("mux server creation error", zap.Error(err))
-						http.Error(response, "internal server error", http.StatusInternalServerError)
+						http.Error(response, err.Error(), http.StatusInternalServerError)
 						return
 					}
-					defer session.Close()
-
-					for {
-						accepted, err := vhost.Accept()
-						if err != nil {
-							break
-						}
-
-						go func(accepted net.Conn) {
-							tunnelLog.Debug("accepted " + accepted.RemoteAddr().String())
-							target, err := session.Open()
-							if err != nil {
-								return
-							}
-							defer target.Close()
-
-							var work sync.WaitGroup
-							work.Add(2)
-
-							go func() {
-								defer work.Done()
-								io.Copy(accepted, target)
-							}()
-
-							go func() {
-								defer work.Done()
-								io.Copy(target, accepted)
-							}()
-
-							work.Wait()
-						}(accepted)
-					}
-
-					logger.Debug("tcp tunnel closed", zap.String("address", address))
-					return
 				}
 
-				id := haikunator.Haikunate()
-				if claimedID := request.URL.Query().Get("id"); len(claimedID) > 0 {
-					logger.Debug("validating claim for tunnel", zap.String("id", claimedID))
-					token := request.Header.Get("X-Tunl-Token")
+				defer address.Close()
 
-					claims, err := verifyToken(signKey, token)
-					if err != nil {
-						logger.Debug("invalid token", zap.String("token", token), zap.Error(err))
-						http.Error(response, "invalid token", http.StatusUnauthorized)
-						return
-					}
-
-					logger.Debug("claim valid", zap.String("id", claimedID))
-					id = claims.Subject
-				}
-
-				hostname := id + "." + ctx.String("domain")
-				buffer := bytes.Buffer{}
-
-				if err := addressTemplate.Execute(&buffer, struct {
-					Id     string
-					Domain string
-				}{Id: id, Domain: ctx.String("domain")}); err != nil {
-					logger.Debug("address-template execution error", zap.Error(err))
-					http.Error(response, "internal server error", http.StatusInternalServerError)
-					return
-				}
-
-				token, err := createToken(signKey, id)
+				token, err := createToken(signKey, address.Address)
 				if err != nil {
 					logger.Error("failed to create token", zap.Error(err))
 					http.Error(response, "internal server error", http.StatusInternalServerError)
-				}
-
-				started := time.Now()
-				vhost, err := mux.Listen(hostname)
-				if err != nil {
-					logger.Error("vhost listen error", zap.Error(err))
 					return
 				}
-				defer vhost.Close()
 
-				accepted := &http.Response{
+				accept := &http.Response{
 					StatusCode: http.StatusOK,
 					Header: http.Header{
-						"X-Tunl-Id":      []string{id},
-						"X-Tunl-Address": []string{buffer.String()},
 						"X-Tunl-Token":   []string{token},
+						"X-Tunl-Address": []string{address.Address},
 					},
 				}
-				if err := accepted.Write(conn); err != nil {
-					logger.Error("failed to accept control stream", zap.Error(err))
+
+				if err := accept.Write(conn); err != nil {
+					logger.Error("failed to write success response", zap.Error(err))
 					return
 				}
 
 				session, err := yamux.Server(conn, nil)
 				if err != nil {
 					logger.Debug("mux server creation error", zap.Error(err))
-					http.Error(response, "internal server error", http.StatusInternalServerError)
 					return
 				}
-				defer session.Close()
 
-				logger.Debug("handshake success")
+				started := time.Now()
+				defer func() {
+					session.Close()
+					logger.Debug("tunnel closed", zap.String("address", address.Address), zap.Duration("time-online", time.Since(started)))
+				}()
 
-				go http.Serve(vhost, http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
-					upstream, err := session.Open()
-					if err != nil {
-						http.Error(response, "bad gateway: "+err.Error(), http.StatusBadGateway)
-						http.Error(response, err.Error(), 500)
-						return
-					}
-
-					defer upstream.Close()
-					logger.Debug("session opened", zap.String("remote", upstream.RemoteAddr().String()), zap.String("local", upstream.LocalAddr().String()))
-
-					if err := request.WriteProxy(upstream); err != nil {
-						http.Error(response, "failed to write request: "+err.Error(), http.StatusBadGateway)
-						return
-					}
-
-					upstreamResponse, err := http.ReadResponse(bufio.NewReader(upstream), request)
-					if err != nil {
-						http.Error(response, "failed to read response: "+err.Error(), http.StatusBadGateway)
-						return
-					}
-
-					for header, values := range upstreamResponse.Header {
-						for _, value := range values {
-							response.Header().Add(header, value)
+				accepted := make(chan net.Conn)
+				go func() {
+					defer close(accepted)
+					for {
+						conn, err := address.Accept()
+						if err != nil {
+							logger.Debug("accept error", zap.Error(err))
+							return
 						}
-					}
 
-					response.WriteHeader(upstreamResponse.StatusCode)
-					if upstreamResponse.Body != nil {
-						io.Copy(response, upstreamResponse.Body)
+						accepted <- conn
 					}
-				}))
+				}()
 
-				<-session.CloseChan()
-				logger.Debug("tunnel closed", zap.String("id", id), zap.Duration("time-online", time.Since(started)))
+				for {
+					select {
+					case <-session.CloseChan():
+						logger.Debug("session closed")
+						return
+
+					case conn, ok := <-accepted:
+						if !ok {
+							return
+						}
+
+						go func(public net.Conn) {
+							defer public.Close()
+							logger.Debug("accepted "+public.RemoteAddr().String(), zap.String("address", address.Address))
+
+							local, err := session.Open()
+							if err != nil {
+								logger.Debug("failed to open session", zap.Error(err))
+								return
+							}
+							defer local.Close()
+
+							var work sync.WaitGroup
+							work.Add(2)
+
+							var in int64
+							var out int64
+
+							go func() {
+								in, _ = io.Copy(local, public)
+								work.Done()
+							}()
+
+							go func() {
+								out, _ = io.Copy(public, local)
+								work.Done()
+							}()
+
+							work.Wait()
+							logger.Debug("connection copy finished", zap.Int64("in", in), zap.Int64("out", out), zap.Stringer("public", public.RemoteAddr()), zap.Stringer("local", local.RemoteAddr()))
+						}(conn)
+					}
+				}
 			}))
 		}()
 
-		go func() {
-			for {
-				conn, err := mux.NextError()
-				logger.Debug("mux error", zap.Error(err))
-
-				if conn != nil {
-					fmt.Fprintln(conn, "500", err.Error())
-					conn.Close()
-				}
-			}
-		}()
+		go mux.HandleErrors()
 
 		if err := <-failed; err != nil {
 			logger.Error("fatal error", zap.Error(err))
