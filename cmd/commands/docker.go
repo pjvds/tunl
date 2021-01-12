@@ -112,7 +112,7 @@ var DockerCommand = &cli.Command{
 			return cli.Exit(err.Error(), 18)
 		}
 
-		fmt.Printf("%s -> %s:%v\n", tunnel.Address(), container.Name[1:], port)
+		PrintTunnel(tunnel.Address(), fmt.Sprintf("%s:%v", container.Name[1:], port))
 
 		go func() {
 			for state := range tunnel.StateChanges() {

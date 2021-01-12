@@ -59,7 +59,7 @@ var TcpCommand = &cli.Command{
 			return cli.Exit(err.Error(), 18)
 		}
 
-		fmt.Printf("%s -> %s\n", tunnel.Address(), ctx.Args().First())
+		PrintTunnel(tunnel.Address(), ctx.Args().First())
 
 		for {
 			conn, err := tunnel.Accept()

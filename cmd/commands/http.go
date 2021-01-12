@@ -80,7 +80,7 @@ var HttpCommand = &cli.Command{
 			return cli.Exit(err.Error(), 18)
 		}
 
-		fmt.Printf("%v -> %v\n", tunnel.Address(), target)
+		PrintTunnel(tunnel.Address(), target)
 
 		handler := handlers.LoggingHandler(os.Stdout, proxy)
 

@@ -72,7 +72,7 @@ var FilesCommand = &cli.Command{
 			handler = handlers.LoggingHandler(os.Stderr, handler)
 		}
 
-		fmt.Fprintln(os.Stdout, tunnel.Address(), "->", absDir)
+		PrintTunnel(tunnel.Address(), absDir)
 
 		go func() {
 			for state := range tunnel.StateChanges() {
