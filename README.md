@@ -2,21 +2,21 @@
 
 With Tunl you can expose services on your localhost to the public via a fast and secure tunnel.
 
-## share a local http process running at localhost:3000
+## expose local http process publicly
 
 ```
 $ tunl http localhost:3000
 https://red-fox.tunl.es/ -> http://localhost:3000
 ```
 
-## Share a local directory with a client or a friend
+## share a local directory publicly
 
 ```
 $ tunl files /the/directory
 https://red-fox.tunl.es/ -> /the/directory
 ```
 
-## Make a private MySQL instance available to a remote machine
+## expose a local MySQL instance publicly
 
 ```
 $ tunl tcp localhost:3306
