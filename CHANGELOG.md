@@ -2,6 +2,30 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.20.0 - 2021-01-12
+
+
+### Miscellaneous Chores
+
+
+### Refactoring
+
+[a086b3](https://github.com/pjvds/tunl/commit/a086b3b2426c1f5a02aa23cbc0b381e969ee1787) - move addressing to server package - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[bdfb8d](https://github.com/pjvds/tunl/commit/bdfb8dd103e5e93e251091c75492e7075376998c) - print public address to stdout and target to stderr - [pjvds](https://github.com/pjvds)
+
+[b3b854](https://github.com/pjvds/tunl/commit/b3b854f67bc4b2c809dc79778a2d9bb75db540ef) - improve usage description of commands - [pjvds](https://github.com/pjvds)
+
+
+### Bug Fixes
+
+[61806c](https://github.com/pjvds/tunl/commit/61806c2fcdff7629b6d8fe3c96629f9dfcecc87d) - incorrect exit result for tunnel accept - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.19.2 - 2021-01-12
 
 
