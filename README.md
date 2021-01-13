@@ -25,7 +25,7 @@ tunl.es:89311 -> localhost:3306
 
 # Installation
 
-Download a prebuild release and put it somewhere in your `$PATH`.
+Download a [binary release](https://github.com/pjvds/tunl/releases/latest) and put it somewhere in your `$PATH`.
 
 ## Basic (curl)
 
