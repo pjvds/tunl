@@ -24,7 +24,7 @@ var FilesCommand = &cli.Command{
 			Value: true,
 		},
 	},
-	Usage:     "Create a file server tunnel",
+	Usage:     "Expose a directory via a public http address",
 	ArgsUsage: "[dir]",
 	Action: func(ctx *cli.Context) error {
 		dir := ctx.Args().First()

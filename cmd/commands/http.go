@@ -20,6 +20,7 @@ var HttpCommand = &cli.Command{
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
 			Name:  "access-log",
+			Usage: "Print http requests in Apache Log format to stderr",
 			Value: true,
 		},
 		&cli.BoolFlag{
@@ -29,7 +30,7 @@ var HttpCommand = &cli.Command{
 		},
 	},
 	ArgsUsage: "<url>",
-	Usage:     "Create a HTTP tunnel to a local address",
+	Usage:     "Expose a HTTP service via a public address",
 	Action: func(ctx *cli.Context) error {
 		var targetURL *url.URL
 		target := ctx.Args().First()

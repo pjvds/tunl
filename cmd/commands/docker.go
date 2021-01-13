@@ -21,7 +21,7 @@ import (
 var DockerCommand = &cli.Command{
 	Name:      "docker",
 	ArgsUsage: "<container> [port]",
-	Usage:     "Create a TCP tunnel to a local docker container",
+	Usage:     "Expose a docker container port via a public address",
 	BashComplete: cli.BashCompleteFunc(func(ctx *cli.Context) {
 		docker, err := client.NewClientWithOpts(client.FromEnv)
 		if err != nil {
