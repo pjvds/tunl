@@ -2,6 +2,39 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.21.0 - 2021-01-13
+
+
+### Miscellaneous Chores
+
+[b6c79b](https://github.com/pjvds/tunl/commit/b6c79b2502ec2dc6a3bd97312f04936e147469c7) - disable snapcrafts in release pipeline - [pjvds](https://github.com/pjvds)
+
+[673de9](https://github.com/pjvds/tunl/commit/673de94282d69d6f7b10eacc7a60704be0cf2b29) - improve readme with minor changes - [pjvds](https://github.com/pjvds)
+
+[055c7a](https://github.com/pjvds/tunl/commit/055c7ad658fb18062ea9aa57e56a51febbd2ea1b) - only require network plug for snapcrafts - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[758383](https://github.com/pjvds/tunl/commit/75838382db8fcfe0f004b6bd437c8d6106464bd4) - improve command and flag usage descriptions - [pjvds](https://github.com/pjvds)
+
+[d013ea](https://github.com/pjvds/tunl/commit/d013eacee40168555829c1ccdfd7ddc1c2af86a0) - skip TLS verification for local address by default - [pjvds](https://github.com/pjvds)
+
+
+### Documentation
+
+[07cca3](https://github.com/pjvds/tunl/commit/07cca3d87d17c3312771e9384c437a5d8d180d7c) - add a link to the latest binary release - [pjvds](https://github.com/pjvds)
+
+[724a09](https://github.com/pjvds/tunl/commit/724a0972f3ed17998356925bcf1519b3b09fa68e) - switch to TLS for install script - [pjvds](https://github.com/pjvds)
+
+[f6be3d](https://github.com/pjvds/tunl/commit/f6be3d5623ae012fd1cf74d93dd2ff96eabb72a1) - add curl and wget installation description - [pjvds](https://github.com/pjvds)
+
+[bcb8f5](https://github.com/pjvds/tunl/commit/bcb8f5d007ea8159f4a531724287518c79cd529d) - shorten example headings - [pjvds](https://github.com/pjvds)
+
+[b120e7](https://github.com/pjvds/tunl/commit/b120e7fbd6ceeecf3d953de6077f7f4ffc2d06cb) - shorting example headings - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.20.0 - 2021-01-12
 
 
