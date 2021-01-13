@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
@@ -19,6 +20,11 @@ var HttpCommand = &cli.Command{
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
 			Name:  "access-log",
+			Value: true,
+		},
+		&cli.BoolFlag{
+			Name:  "insecure",
+			Usage: "Skip TLS verification for local address (this does not effect TLS between the tunl client and server or the public address)",
 			Value: true,
 		},
 	},
@@ -44,6 +50,13 @@ var HttpCommand = &cli.Command{
 		targetURL = parsed
 
 		proxy := httputil.NewSingleHostReverseProxy(targetURL)
+
+		if ctx.Bool("insecure") {
+			proxy.Transport = &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			}
+		}
+
 		originalDirector := proxy.Director
 
 		proxy.Director = func(request *http.Request) {
