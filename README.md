@@ -23,6 +23,13 @@ $ tunl tcp localhost:3306
 tunl.es:89311 -> localhost:3306
 ```
 
+## Expose a service running in a docker container
+
+```
+$ tunl docker <container-name> <port>
+tunl.es:48221 -> <container-name>:<port>
+```
+
 # Installation
 
 Download a [binary release](https://github.com/pjvds/tunl/releases/latest) and put it somewhere in your `$PATH`.
