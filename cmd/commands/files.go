@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 
 	"github.com/gorilla/handlers"
-	"github.com/markbates/pkger"
-	"github.com/pjvds/tunl/pkg/fallback"
 	"github.com/pjvds/tunl/pkg/tunnel"
 	"go.uber.org/zap"
 
@@ -66,12 +64,7 @@ var FilesCommand = &cli.Command{
 			return cli.Exit(err.Error(), 18)
 		}
 
-		assets, err := pkger.Open("/assets/favicon")
-		if err != nil {
-			return cli.Exit(err.Error(), 19)
-		}
-
-		handler := fallback.Fallback(http.FileServer(assets), http.FileServer(http.Dir(absDir)))
+		handler := http.FileServer(http.Dir(absDir))
 
 		if ctx.Bool("access-log") {
 			handler = handlers.LoggingHandler(os.Stderr, handler)
