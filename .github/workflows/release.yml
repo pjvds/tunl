@@ -39,6 +39,12 @@ jobs:
         run: |
           echo "${{ secrets.DOCKER_TOKEN }}" | \
           docker login -u pjvds --password-stdin
+
+      -
+        name: Run pkger
+        run: |
+          go run github.com/markbates/pkger/cmd/pkger
+
       -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
