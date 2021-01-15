@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.23.0-2 - 2021-01-15
+
+
+### Miscellaneous Chores
+
+[d076a5](https://github.com/pjvds/tunl/commit/d076a5b31da71d001a90f4e8786ce688fa233df8) - release version to brew tap - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.23.0 - 2021-01-15
 
 
