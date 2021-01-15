@@ -2,6 +2,34 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.22.0 - 2021-01-15
+
+
+### Miscellaneous Chores
+
+[7accb8](https://github.com/pjvds/tunl/commit/7accb8481be51e57dfef35c542691fcd0d34633c) - run pkger during release - [pjvds](https://github.com/pjvds)
+
+
+### Refactoring
+
+[4f6732](https://github.com/pjvds/tunl/commit/4f6732db0ef2d3ec3648f43092a9a22ca973f272) - move template to package and assets - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[c1a397](https://github.com/pjvds/tunl/commit/c1a397f6ab0a53326860605490938bd2f96d15db) - switch from go-bin to pkger for embedding file and directories - [pjvds](https://github.com/pjvds)
+
+[991d38](https://github.com/pjvds/tunl/commit/991d38998b2caaa71bd9d1ca9b18f32cc34289a6) - add new logo to assets - [pjvds](https://github.com/pjvds)
+
+[58cada](https://github.com/pjvds/tunl/commit/58cada314a71300477e95bb64b134cfb12d73f4c) - serve explicit error page for downstream errors - [pjvds](https://github.com/pjvds)
+
+
+### Documentation
+
+[18554f](https://github.com/pjvds/tunl/commit/18554ff67190a7db854f40be0102629d554840f0) - add docker container example - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.21.0 - 2021-01-13
 
 
