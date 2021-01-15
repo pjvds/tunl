@@ -1,12 +1,13 @@
 package templates
 
 import (
+	_ "embed"
 	"html/template"
 	"io"
-	"io/ioutil"
-
-	"github.com/markbates/pkger"
 )
+
+//go:embed http-client-error.tmpl
+var httpClientError string
 
 type HttpClientErrorInput struct {
 	RemoteAddress     string
@@ -19,25 +20,13 @@ type HttpClientErrorInput struct {
 	Year              int
 }
 
-var httpClientError *template.Template
-
-func HttpClientError(writer io.Writer, input HttpClientErrorInput) error {
-	return httpClientError.Execute(writer, input)
-}
+var httpClientErrorTemplate *template.Template
 
 func init() {
-	httpClientErrorFile, err := pkger.Open("/assets/templates/http-client-error.tmpl")
-	if err != nil {
-		panic(err)
-	}
+	httpClientErrorTemplate = template.Must(template.New("").Parse(httpClientError))
+}
 
-	httpClientErrorContent, err := ioutil.ReadAll(httpClientErrorFile)
-	if err != nil {
-		panic(err)
-	}
+func HttpClientError(writer io.Writer, input HttpClientErrorInput) error {
 
-	httpClientError, err = template.New("http-client-error").Parse(string(httpClientErrorContent))
-	if err != nil {
-		panic(err)
-	}
+	return httpClientErrorTemplate.ExecuteTemplate(writer, "http-client-error", input)
 }
