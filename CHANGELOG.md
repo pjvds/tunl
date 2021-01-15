@@ -2,6 +2,22 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.23.0 - 2021-01-15
+
+
+### Miscellaneous Chores
+
+[7be460](https://github.com/pjvds/tunl/commit/7be4600bc3b622ad0d7bba93a6fd61c737c10a8d) - build releases with go 1.16beta1 - [pjvds](https://github.com/pjvds)
+
+[68cbca](https://github.com/pjvds/tunl/commit/68cbca283c2314eb11a84102a73987afdad7cd8b) - add build pipeline with go1.16beta1 - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[c9f538](https://github.com/pjvds/tunl/commit/c9f53880c64e2b6eb0c36214d635abf57adbe2ba) - optimize file embeds - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.22.1 - 2021-01-15
 
 
