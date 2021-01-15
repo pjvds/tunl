@@ -23,10 +23,9 @@ type HttpClientErrorInput struct {
 var httpClientErrorTemplate *template.Template
 
 func init() {
-	httpClientErrorTemplate = template.Must(template.New("").Parse(httpClientError))
+	httpClientErrorTemplate = template.Must(template.New("http-client-error").Parse(httpClientError))
 }
 
 func HttpClientError(writer io.Writer, input HttpClientErrorInput) error {
-
-	return httpClientErrorTemplate.ExecuteTemplate(writer, "http-client-error", input)
+	return httpClientErrorTemplate.Execute(writer, input)
 }
