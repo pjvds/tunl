@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -13,119 +12,11 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
+	"github.com/pjvds/tunl/pkg/templates"
 	"github.com/pjvds/tunl/pkg/tunnel"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 )
-
-var downstreamErrTemplate, _ = template.New("").Parse(`
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="/docs/4.0/assets/img/favicons/favicon.ico">
-
-    <title>tunl client proxy error</title>
-
-		<script src="https://kit.fontawesome.com/f95edda927.js" crossorigin="anonymous"></script>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-
-		<style>
-		html,
-		body {
-			height: 100%;
-		}
-
-		body {
-			display: -ms-flexbox;
-			display: -webkit-box;
-			display: flex;
-			-ms-flex-align: center;
-			-ms-flex-pack: center;
-			-webkit-box-align: center;
-			align-items: center;
-			-webkit-box-pack: center;
-			justify-content: center;
-			padding-top: 40px;
-			padding-bottom: 40px;
-			background-color: #f5f5f5;
-		}
-
-		.list-group{
-			margin-left: 0em;
-		}
-
-		.form-signin {
-			width: 100%;
-			max-width: 500px;
-			padding: 15px;
-			margin: 0 auto;
-		}
-		.form-signin .checkbox {
-			font-weight: 400;
-		}
-		.form-signin .form-control {
-			position: relative;
-			box-sizing: border-box;
-			height: auto;
-			padding: 10px;
-			font-size: 16px;
-		}
-		.form-signin .form-control:focus {
-			z-index: 2;
-		}
-		.form-signin input[type="email"] {
-			margin-bottom: -1px;
-			border-bottom-right-radius: 0;
-			border-bottom-left-radius: 0;
-		}
-		.form-signin input[type="password"] {
-			margin-bottom: 10px;
-			border-top-left-radius: 0;
-			border-top-right-radius: 0;
-		}
-		</style>
-  </head>
-
-  <body >
-    <div class="form-signin">
-      <h1 class="h2 mb-3 font-weight-normal">Oops! 
-			<br/>
-			{{.ErrMessage}}</h1>
-			<p>
-				The public address <code>{{.RemoteAddress}}</code> received a request and forwared it succesfully to the tunl client running at <code>{{.LocalHostname}}</code>. But this client failed to proxy the request to http target <code>{{.LocalAddress}}</code>.
-			</p>
-			<p>
-			Please make sure the target HTTP service is running at <a href="{{.LocalAddress}}">{{.LocalAddress}}</a> and can be reached from the local network.
-			</p>
-      <h1 class="h2 mb-3 font-weight-normal">Details</h1>
-			<p>
-			<div class="alert alert-secondary" role="alert">
-			<pre>[{{.ErrType}}]
-{{.ErrDetails}}</pre>
-			</div>
-			</p>
-
-      <h1 class="h2 mb-3 font-weight-normal">Status</h1>
-			<p>
-			<ul class="fa-ul list-group">
-			<li class="list-group-item list-group-item-success"><span class="fa-li"><i class="fas fa-check"></i></span>Public address received the request</li>
-			<li class="list-group-item list-group-item-success"><span class="fa-li"><i class="fas fa-check"></i></span>Request forward to local client</code></li>
-			<li class="list-group-item list-group-item-success"><span class="fa-li"><i class="fas fa-check"></i></span>Local client received the request</li>
-			<li class="list-group-item list-group-item-danger"><span class="fa-li"><i class="fas fa-times"></i></span>Local client failed to proxy request to target url: <br /><code>{{.ErrMessage}}</code></li>
-			</ul>
-			</p>
-      <button class="btn btn-lg btn-primary btn-block" onClick="window.location.reload();">Retry</button>
-      <p class="mt-5 mb-3 text-muted">&copy; tunl.es {{.Year}}</p>
-    </div>
-  </body>
-</html>
-`)
 
 var HttpCommand = &cli.Command{
 	Name: "http",
@@ -226,16 +117,7 @@ var HttpCommand = &cli.Command{
 
 			response.WriteHeader(http.StatusBadGateway)
 
-			downstreamErrTemplate.Execute(response, struct {
-				RemoteAddress     string
-				LocalHostname     string
-				LocalAddress      string
-				TunlClientVersion string
-				ErrMessage        string
-				ErrType           string
-				ErrDetails        string
-				Year              int
-			}{
+			templates.HttpClientError(response, templates.HttpClientErrorInput{
 				RemoteAddress:     tunnel.Address(),
 				LocalHostname:     hostname,
 				LocalAddress:      target,
