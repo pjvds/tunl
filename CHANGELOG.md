@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.24.0 - 2021-01-15
+
+
+### Bug Fixes
+
+[c76e1d](https://github.com/pjvds/tunl/commit/c76e1de30f0bf32ac6c6be366eb2a7e938cf3f14) - error template not served correctly - [pjvds](https://github.com/pjvds)
+
+
+### Miscellaneous Chores
+
+[d42b72](https://github.com/pjvds/tunl/commit/d42b72c5249d61a3860e3c2ace6206d6bd1a5106) - bind homebrew tap token - [pjvds](https://github.com/pjvds)
+
+[ad7bf4](https://github.com/pjvds/tunl/commit/ad7bf408a15296cc88a53b9b3152eaf80e7cb746) - add homebrew tap token - [pjvds](https://github.com/pjvds)
+
+[d076a5](https://github.com/pjvds/tunl/commit/d076a5b31da71d001a90f4e8786ce688fa233df8) - release version to brew tap - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.23.0-2 - 2021-01-15
 
 
