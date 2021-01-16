@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.25.0 - 2021-01-16
+
+
+### Features
+
+[343e67](https://github.com/pjvds/tunl/commit/343e67575f40765e0838bc60bb5c2f04d616c297) - simplify files serving by removing fallback handling - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.24.0 - 2021-01-15
 
 
