@@ -10,6 +10,8 @@ import (
 
 	"github.com/goji/httpauth"
 	"github.com/gorilla/handlers"
+	"github.com/gorilla/sessions"
+	"github.com/pjvds/tunl/pkg/templates"
 	"github.com/pjvds/tunl/pkg/tunnel"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
@@ -21,6 +23,9 @@ var DirCommand = &cli.Command{
 		&cli.BoolFlag{
 			Name:  "access-log",
 			Value: true,
+		},
+		&cli.StringFlag{
+			Name: "password",
 		},
 		&cli.StringFlag{
 			Name:  "basic-auth",
@@ -83,6 +88,45 @@ var DirCommand = &cli.Command{
 		}
 
 		handler := http.FileServer(http.Dir(absDir))
+
+		if password := ctx.String("password"); len(password) > 0 {
+			next := handler
+
+			var store = sessions.NewCookieStore([]byte("foobar"))
+
+			handler = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+				session, _ := store.Get(r, "tunl-pass")
+
+				if session.Values["pass"] == password {
+					next.ServeHTTP(rw, r)
+					return
+				}
+
+				if r.Method == http.MethodPost {
+					if r.ParseForm(); err != nil {
+						http.Error(rw, err.Error(), http.StatusBadRequest)
+						return
+					}
+
+					pass := r.FormValue("password")
+					if pass != password {
+						templates.Password(rw, templates.PasswordInput{
+							Message: "invalid password",
+						})
+						return
+					}
+
+					session.Values["pass"] = pass
+					session.Save(r, rw)
+
+					http.Redirect(rw, r, "/", http.StatusSeeOther)
+					return
+				}
+				templates.Password(rw, templates.PasswordInput{})
+
+			})
+
+		}
 
 		if basicAuth := ctx.String("basic-auth"); len(basicAuth) > 0 {
 			split := strings.Split(basicAuth, ":")
