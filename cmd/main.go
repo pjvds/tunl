@@ -27,6 +27,7 @@ func main() {
 		Commands: []*cli.Command{
 			commands.DockerCommand,
 			commands.DaemonCommand,
+			commands.DirCommand,
 			commands.FilesCommand,
 			commands.HttpCommand,
 			commands.TcpCommand,
