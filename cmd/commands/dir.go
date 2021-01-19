@@ -6,7 +6,9 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/goji/httpauth"
 	"github.com/gorilla/handlers"
 	"github.com/pjvds/tunl/pkg/tunnel"
 	"github.com/urfave/cli/v2"
@@ -20,6 +22,11 @@ var DirCommand = &cli.Command{
 			Name:  "access-log",
 			Value: true,
 		},
+		&cli.StringFlag{
+			Name:  "basic-auth",
+			Usage: "Adds HTTP basic access authentication",
+		},
+
 		&cli.BoolFlag{
 			Name:  "qr",
 			Usage: "Print QR code of the public address",
@@ -75,15 +82,34 @@ var DirCommand = &cli.Command{
 			return nil
 		}
 
-		tunnel, err := tunnel.OpenHTTP(ctx.Context, zap.NewNop(), hostURL)
-		if err != nil {
-			return cli.Exit(err.Error(), 18)
-		}
-
 		handler := http.FileServer(http.Dir(absDir))
+
+		if basicAuth := ctx.String("basic-auth"); len(basicAuth) > 0 {
+			split := strings.Split(basicAuth, ":")
+			if len(split) != 2 {
+				return cli.Exit("invalid basic-auth value", 1)
+			}
+
+			user := split[0]
+			password := split[1]
+
+			if len(user) == 0 {
+				return cli.Exit("invalid basic-auth value: empty user", 1)
+			}
+			if len(password) == 0 {
+				return cli.Exit("invalid basic-auth value: empty password", 1)
+			}
+
+			handler = httpauth.SimpleBasicAuth(user, password)(handler)
+		}
 
 		if ctx.Bool("access-log") {
 			handler = handlers.LoggingHandler(os.Stderr, handler)
+		}
+
+		tunnel, err := tunnel.OpenHTTP(ctx.Context, zap.NewNop(), hostURL)
+		if err != nil {
+			return cli.Exit(err.Error(), 18)
 		}
 
 		PrintTunnel(ctx, tunnel.Address(), absDir)

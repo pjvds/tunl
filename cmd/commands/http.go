@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/goji/httpauth"
 	"github.com/gorilla/handlers"
 	"github.com/pjvds/tunl/pkg/templates"
 	"github.com/pjvds/tunl/pkg/tunnel"
@@ -25,6 +26,10 @@ var HttpCommand = &cli.Command{
 			Name:  "access-log",
 			Usage: "Print http requests in Apache Log format to stderr",
 			Value: true,
+		},
+		&cli.StringFlag{
+			Name:  "basic-auth",
+			Usage: "Adds HTTP basic access authentication",
 		},
 		&cli.BoolFlag{
 			Name:  "insecure",
@@ -131,6 +136,25 @@ var HttpCommand = &cli.Command{
 				ErrDetails:        err.Error(),
 				Year:              time.Now().Year(),
 			})
+		}
+
+		if basicAuth := ctx.String("basic-auth"); len(basicAuth) > 0 {
+			split := strings.Split(basicAuth, ":")
+			if len(split) != 2 {
+				return cli.Exit("invalid basic-auth value", 1)
+			}
+
+			user := split[0]
+			password := split[1]
+
+			if len(user) == 0 {
+				return cli.Exit("invalid basic-auth value: empty user", 1)
+			}
+			if len(password) == 0 {
+				return cli.Exit("invalid basic-auth value: empty password", 1)
+			}
+
+			handler = httpauth.SimpleBasicAuth(user, password)(handler)
 		}
 
 		if err := http.Serve(tunnel, handler); err != nil {
