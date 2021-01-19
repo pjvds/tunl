@@ -26,14 +26,14 @@ jobs:
       - 
         name: Update APT
         run: sudo apt-get -yq update
-      -
-        name: Install Snapcraft
-        run: sudo apt-get -yq --no-install-suggests --no-install-recommends install snapcraft
-      - 
-        name: Login to Snapcraft
-        env:
-          SNAPCRAFT_LOGIN: ${{ secrets.SNAPCRAFT_LOGIN }}
-        run: snapcraft login --with <(printf "$SNAPCRAFT_LOGIN")
+#      -
+#        name: Install Snapcraft
+#        run: sudo apt-get -yq --no-install-suggests --no-install-recommends install snapcraft
+#      - 
+#        name: Login to Snapcraft
+#        env:
+#          SNAPCRAFT_LOGIN: ${{ secrets.SNAPCRAFT_LOGIN }}
+#        run: snapcraft login --with <(printf "$SNAPCRAFT_LOGIN")
       -
         name: Login to GitHub Packages Registry
         run: |
