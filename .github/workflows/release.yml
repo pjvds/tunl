@@ -21,8 +21,7 @@ jobs:
       -
         name: Get go 1.16beta1
         run: |
-          go get golang.org/dl/go1.16beta1
-          go1.16beta1 download
+          go run golang.org/dl/go1.16beta1 download
       - 
         name: Update APT
         run: sudo apt-get -yq update
