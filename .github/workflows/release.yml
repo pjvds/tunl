@@ -45,6 +45,10 @@ jobs:
           echo "${{ secrets.DOCKER_TOKEN }}" | \
           docker login -u pjvds --password-stdin
       -
+        name: Dump diff
+        run: |
+          git diff
+      -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
