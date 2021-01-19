@@ -21,7 +21,13 @@ import (
 var DockerCommand = &cli.Command{
 	Name:      "docker",
 	ArgsUsage: "<container> [port]",
-	Usage:     "Expose a docker container port via a public address",
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:  "qr",
+			Usage: "Print QR code of the public address",
+		},
+	},
+	Usage: "Expose a docker container port via a public address",
 	BashComplete: cli.BashCompleteFunc(func(ctx *cli.Context) {
 		docker, err := client.NewClientWithOpts(client.FromEnv)
 		if err != nil {
@@ -112,7 +118,7 @@ var DockerCommand = &cli.Command{
 			return cli.Exit(err.Error(), 18)
 		}
 
-		PrintTunnel(tunnel.Address(), fmt.Sprintf("%s:%v", container.Name[1:], port))
+		PrintTunnel(ctx, tunnel.Address(), fmt.Sprintf("%s:%v", container.Name[1:], port))
 
 		go func() {
 			for state := range tunnel.StateChanges() {

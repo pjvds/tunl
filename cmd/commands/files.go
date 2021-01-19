@@ -21,6 +21,10 @@ var FilesCommand = &cli.Command{
 			Name:  "access-log",
 			Value: true,
 		},
+		&cli.BoolFlag{
+			Name:  "qr",
+			Usage: "Print QR code of the public address",
+		},
 	},
 	Usage:     "Expose a directory via a public http address",
 	ArgsUsage: "[dir]",
@@ -70,7 +74,7 @@ var FilesCommand = &cli.Command{
 			handler = handlers.LoggingHandler(os.Stderr, handler)
 		}
 
-		PrintTunnel(tunnel.Address(), absDir)
+		PrintTunnel(ctx, tunnel.Address(), absDir)
 
 		go func() {
 			for state := range tunnel.StateChanges() {

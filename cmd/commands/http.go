@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
-	"github.com/mdp/qrterminal/v3"
 	"github.com/pjvds/tunl/pkg/templates"
 	"github.com/pjvds/tunl/pkg/tunnel"
 	"github.com/urfave/cli/v2"
@@ -102,11 +101,7 @@ var HttpCommand = &cli.Command{
 			return cli.Exit(err.Error(), 18)
 		}
 
-		PrintTunnel(tunnel.Address(), target)
-
-		if ctx.Bool("qr") {
-			qrterminal.GenerateHalfBlock(tunnel.Address(), qrterminal.L, os.Stdout)
-		}
+		PrintTunnel(ctx, tunnel.Address(), target)
 
 		handler := handlers.LoggingHandler(os.Stdout, proxy)
 
