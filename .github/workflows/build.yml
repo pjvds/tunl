@@ -32,4 +32,4 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
-          args: release --rm-dist --skip-publish --skip-validate --snapshot
+          args: build --rm-dist
