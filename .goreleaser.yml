@@ -14,7 +14,6 @@ builds:
       - -X github.com/pjvds/tunl/pkg/version.Version={{.Version}}
     env:
       - CGO_ENABLED=0
-    gobinary: "go1.16beta1"
     goos:
       - linux
       - windows
