@@ -38,6 +38,19 @@ var DirCommand = &cli.Command{
 			return cli.Exit("invalid dir: "+err.Error(), 1)
 		}
 
+		stat, err := os.Stat(absDir)
+		if err != nil {
+			if os.IsNotExist(err) {
+				return cli.Exit("directory doesn't exist", 1)
+			}
+
+			return cli.Exit(err.Error(), 1)
+		}
+
+		if !stat.IsDir() {
+			return cli.Exit(dir+" not a directory", 1)
+		}
+
 		host := ctx.String("host")
 		if len(host) == 0 {
 			fmt.Print("Host cannot be empty\nSee --host flag for more information.\n\n")
