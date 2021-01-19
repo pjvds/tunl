@@ -17,7 +17,7 @@ require (
 	github.com/hashicorp/yamux v0.0.0-20200609203250-aecfd211c9ce
 	github.com/inconshreveable/go-vhost v0.0.0-20160627193104-06d84117953b
 	github.com/kr/pretty v0.2.1 // indirect
-	github.com/markbates/pkger v0.17.1
+	github.com/mdp/qrterminal/v3 v3.0.0
 	github.com/moby/term v0.0.0-20201216013528-df9cb8a40635 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
@@ -29,7 +29,6 @@ require (
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/yelinaung/go-haikunator v0.0.0-20150320004105-1249cae259af
 	go.uber.org/zap v1.16.0
-	golang.org/dl v0.0.0-20201217181409-aeefed14b4e2 // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/mod v0.4.0 // indirect
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
+	"github.com/mdp/qrterminal/v3"
 	"github.com/pjvds/tunl/pkg/templates"
 	"github.com/pjvds/tunl/pkg/tunnel"
 	"github.com/urfave/cli/v2"
@@ -30,6 +31,10 @@ var HttpCommand = &cli.Command{
 			Name:  "insecure",
 			Usage: "Skip TLS verification for local address (this does not effect TLS between the tunl client and server or the public address)",
 			Value: true,
+		},
+		&cli.BoolFlag{
+			Name:  "qr",
+			Usage: "Print QR code of the public address",
 		},
 	},
 	ArgsUsage: "<url>",
@@ -98,6 +103,10 @@ var HttpCommand = &cli.Command{
 		}
 
 		PrintTunnel(tunnel.Address(), target)
+
+		if ctx.Bool("qr") {
+			qrterminal.GenerateHalfBlock(tunnel.Address(), qrterminal.L, os.Stdout)
+		}
 
 		handler := handlers.LoggingHandler(os.Stdout, proxy)
 
