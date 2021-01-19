@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.26.0 - 2021-01-19
+
+
+### Features
+
+[be188b](https://github.com/pjvds/tunl/commit/be188b348412da23dcd354c6f0380ae2e1f6175e) - add ability to print QR code with the public address - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.25.0 - 2021-01-16
 
 
