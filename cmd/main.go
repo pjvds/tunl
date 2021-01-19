@@ -1,5 +1,3 @@
-//go:generate go run github.com/markbates/pkger/cmd/pkger -o cmd
-
 package main
 
 import (
