@@ -29,7 +29,7 @@ var DockerCommand = &cli.Command{
 	},
 	Usage: "Expose a docker container port via a public address",
 	BashComplete: cli.BashCompleteFunc(func(ctx *cli.Context) {
-		docker, err := client.NewClientWithOpts(client.FromEnv)
+		docker, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 		if err != nil {
 			return
 		}
