@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.28.1 - 2021-01-20
+
+
+### Bug Fixes
+
+[66ef38](https://github.com/pjvds/tunl/commit/66ef3829324834b81ae8563d4e767da2b679e84b) - fix client version only negotiated in auto-complete - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.28.0 - 2021-01-20
 
 
