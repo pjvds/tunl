@@ -31,6 +31,7 @@ func main() {
 			commands.FilesCommand,
 			commands.HttpCommand,
 			commands.TcpCommand,
+			commands.WebdavCommand,
 		},
 	}
 
