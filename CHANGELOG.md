@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.28.0 - 2021-01-20
+
+
+### Miscellaneous Chores
+
+[8d0ac1](https://github.com/pjvds/tunl/commit/8d0ac10c30c3f6ed5e4582032cbd3b4bed165000) - run goreleaser as snapshot build - [pjvds](https://github.com/pjvds)
+
+[5fed77](https://github.com/pjvds/tunl/commit/5fed77d484baefa0417f57a7d5a652f7baaa4db5) - fix build pipeline - [pjvds](https://github.com/pjvds)
+
+[e74ba7](https://github.com/pjvds/tunl/commit/e74ba7d45e526420e9a19a6f708b3d57514629d8) - install Go 1.16 via setup-go action - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[4bee51](https://github.com/pjvds/tunl/commit/4bee51e62db54489b2f951508d7234c95deae78d) - add docker client API version negotiation - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.27.0 - 2021-01-20
 
 
