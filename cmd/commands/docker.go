@@ -62,7 +62,7 @@ var DockerCommand = &cli.Command{
 			return cli.Exit("Host cannot be empty.", 1)
 		}
 
-		docker, err := client.NewClientWithOpts(client.FromEnv)
+		docker, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 		if err != nil {
 			panic(err)
 		}
