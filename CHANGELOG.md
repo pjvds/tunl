@@ -2,6 +2,30 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.27.0 - 2021-01-20
+
+
+### Bug Fixes
+
+[d2d27e](https://github.com/pjvds/tunl/commit/d2d27e70ba3c844ca79af51afb87527fc114e2a0) - fix missing template for single password auth - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[348ded](https://github.com/pjvds/tunl/commit/348ded04e0eb9e9973d5f6810b61b90c60dd527e) - add webdav command to publish a local dir via webdav - [pjvds](https://github.com/pjvds)
+
+[c28fd9](https://github.com/pjvds/tunl/commit/c28fd9249548420286b21678104d409cc74eac28) - add ability to add single password protection - [pjvds](https://github.com/pjvds)
+
+[53f551](https://github.com/pjvds/tunl/commit/53f5513e50b294c434cef91049df508865263ac4) - add http basic auth support - [pjvds](https://github.com/pjvds)
+
+[262259](https://github.com/pjvds/tunl/commit/262259f9c08a428c3565fc2ae3c1ec23589de642) - validate directory before starting tunnel - [pjvds](https://github.com/pjvds)
+
+[10e6cb](https://github.com/pjvds/tunl/commit/10e6cbd7fcbe16e7c7f4805163fe37f25ab4709b) - replace files command with dir - [pjvds](https://github.com/pjvds)
+
+[7c1c6a](https://github.com/pjvds/tunl/commit/7c1c6a834f1fcf7e92aca5b7087c8cdfb385c99d) - add ability to print QR code with the public address - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.26.0 - 2021-01-19
 
 
