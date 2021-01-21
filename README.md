@@ -32,18 +32,31 @@ tunl.es:48221 -> <container-name>:<port>
 
 # Installation
 
-Download a [binary release](https://github.com/pjvds/tunl/releases/latest) and put it somewhere in your `$PATH`.
+Download the [binary release](https://github.com/pjvds/tunl/releases/latest) and put it somewhere in your `$PATH`.
 
 ## Basic 
 
 **curl**
 ```
+# install it to ./bin/tunl
 curl -fsSL https://get.tunl.es | sh
 ```
 
-**wget**
 ```
+# install it to /sbin/tunl
+curl -fsSL https://get.tunl.es | sudo sh -s -- -b /sbin
+```
+
+**wget**
+
+```
+# install it to ./bin/tunl
 wget -qO- https://get.tunl.es | sh
+```
+
+```
+# install it to /sbin/tunl
+wget -qO- https://get.tunl.es | sudo sh -s -- -b /sbin
 ```
 
 ## Arch Linux
