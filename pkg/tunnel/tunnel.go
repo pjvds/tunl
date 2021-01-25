@@ -145,7 +145,7 @@ func open(ctx context.Context, log *zap.Logger, host *url.URL, t client.TunnelTy
 
 	state, err := connect.Run(ctx, log)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "tunl server connection failed")
 	}
 
 	go func() {
