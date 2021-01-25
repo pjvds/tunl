@@ -11,10 +11,12 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	honeycomb "github.com/getspine/go-metrics-honeycomb"
 	"github.com/hashicorp/yamux"
 	"github.com/inconshreveable/go-vhost"
 	"github.com/pjvds/tunl/pkg/tunnel/certs"
 	"github.com/pjvds/tunl/pkg/tunnel/server"
+	"github.com/rcrowley/go-metrics"
 	"github.com/rs/xid"
 
 	"github.com/pkg/errors"
@@ -87,6 +89,13 @@ var DaemonCommand = &cli.Command{
 			Name:  "sign-key",
 			Value: xid.New().String(),
 		},
+		&cli.StringFlag{
+			Name: "metrics.honeycomb.token",
+		},
+		&cli.StringFlag{
+			Name:  "metrics.honeycomb.name",
+			Value: "tunl",
+		},
 	},
 	Action: func(ctx *cli.Context) error {
 		signKey := ctx.String("sign-key")
@@ -100,6 +109,19 @@ var DaemonCommand = &cli.Command{
 			logger.Error("bind flag value cannot be empty")
 			return nil
 		}
+
+		if token := ctx.String("metrics.honeycomb.token"); len(token) > 0 {
+			dataset := "tunl"
+			if value := ctx.String("metrics.honeycomb.dataset"); len(value) > 0 {
+				dataset = value
+			}
+
+			go honeycomb.Honeycomb(metrics.DefaultRegistry, 10*time.Second, token, dataset, []float64{0.50, 0.75, 0.95, 0.99})
+			logger.Info("honeycomb sink configurated", zap.String("dataset", dataset))
+		}
+
+		tunnelCount := metrics.GetOrRegisterCounter("tunnel", nil)
+		connectionCount := metrics.GetOrRegisterCounter("connections", nil)
 
 		var listener net.Listener
 		if certGlobs := ctx.StringSlice("tls-certs"); len(certGlobs) > 0 {
@@ -228,6 +250,10 @@ var DaemonCommand = &cli.Command{
 				accepted := make(chan net.Conn)
 				go func() {
 					defer close(accepted)
+					defer tunnelCount.Dec(1)
+
+					tunnelCount.Inc(1)
+
 					for {
 						conn, err := address.Accept()
 						if err != nil {
@@ -252,6 +278,10 @@ var DaemonCommand = &cli.Command{
 
 						go func(public net.Conn) {
 							defer public.Close()
+							defer connectionCount.Dec(1)
+
+							connectionCount.Inc(1)
+
 							logger.Debug("accepted "+public.RemoteAddr().String(), zap.String("address", address.Address))
 
 							local, err := session.Open()

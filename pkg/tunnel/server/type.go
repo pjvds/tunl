@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/armon/go-metrics"
 	"github.com/inconshreveable/go-vhost"
 	"github.com/yelinaung/go-haikunator"
 	"go.uber.org/zap"
@@ -38,6 +39,8 @@ func (c *PublicAddress) Close() error {
 }
 
 func NewAddresses(logger *zap.Logger, hostname string, httpMux *vhost.HTTPMuxer) *Addresses {
+	metrics.SetGauge([]string{"addresses"}, 0)
+
 	return &Addresses{
 		logger:     logger,
 		hostname:   hostname,
@@ -64,6 +67,7 @@ func (c *Addresses) free(address string) {
 
 	delete(c.addresses, address)
 
+	metrics.SetGauge([]string{"addresses"}, float32(len(c.addresses)))
 	c.logger.Debug("public address freed", zap.String("address", address))
 }
 
@@ -77,6 +81,7 @@ func (c *Addresses) put(address string) error {
 
 	c.addresses[address] = struct{}{}
 
+	metrics.SetGauge([]string{"addresses"}, float32(len(c.addresses)))
 	c.logger.Debug("public address created", zap.String("address", address))
 	return nil
 }
