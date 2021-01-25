@@ -21,7 +21,7 @@ func ParseHostURL(host *url.URL) (ServerInfo, error) {
 		case "http":
 			port = "80"
 		case "https":
-			port = "442"
+			port = "443"
 		default:
 			defaultPort, err := net.LookupPort("tcp", host.Scheme)
 			if err != nil {
