@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.29.0 - 2021-01-25
+
+
+### Features
+
+[f28a3d](https://github.com/pjvds/tunl/commit/f28a3dacb1088cb2f4cbd120e94729b1fbd4d85a) - increase details in error messages for connect state - [pjvds](https://github.com/pjvds)
+
+[fa76b6](https://github.com/pjvds/tunl/commit/fa76b6c8ba3ae6a44d9a13254b5fd4842e92c018) - remove default port lookup for most used uri schemes - [pjvds](https://github.com/pjvds)
+
+[7542e0](https://github.com/pjvds/tunl/commit/7542e0f06e938dd12346b4baf34fcb67f3353855) - adds honeycomb metrics logging - [pjvds](https://github.com/pjvds)
+
+
+### Documentation
+
+[e488d0](https://github.com/pjvds/tunl/commit/e488d070e71a5119d28322686d0ca2a9dbd55a5d) - add installation path description to examples - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.28.1 - 2021-01-20
 
 
