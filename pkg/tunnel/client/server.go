@@ -17,12 +17,18 @@ type ServerInfo struct {
 func ParseHostURL(host *url.URL) (ServerInfo, error) {
 	port := host.Port()
 	if len(port) == 0 {
-		defaultPort, err := net.LookupPort("tcp", host.Scheme)
-		if err != nil {
-			return ServerInfo{}, err
+		switch host.Scheme {
+		case "http":
+			port = "80"
+		case "https":
+			port = "442"
+		default:
+			defaultPort, err := net.LookupPort("tcp", host.Scheme)
+			if err != nil {
+				return ServerInfo{}, errors.Wrap(err, "default port lookup failed for scheme: "+host.Scheme)
+			}
+			port = strconv.Itoa(defaultPort)
 		}
-
-		port = strconv.Itoa(defaultPort)
 	}
 
 	address := net.JoinHostPort(host.Hostname(), port)
