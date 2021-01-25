@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.29.1 - 2021-01-25
+
+
+### Bug Fixes
+
+[303a82](https://github.com/pjvds/tunl/commit/303a8280f13966bf679c1e6927cde71ee89a827c) - fix potential wrong control port choosen - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.29.0 - 2021-01-25
 
 
