@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Masterminds/semver"
 	"github.com/goji/httpauth"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/sessions"
@@ -159,8 +160,18 @@ var DirCommand = &cli.Command{
 		PrintTunnel(ctx, tunnel.Address(), absDir)
 
 		go func() {
-			for state := range tunnel.StateChanges() {
-				println(state)
+			for {
+				select {
+				case state := <-tunnel.StateChanges():
+					println(state)
+				case version := <-tunnel.Versions():
+					current, err := semver.NewVersion(version.String())
+					if err == nil {
+						if current.LessThan(&version) {
+							println("new version available: " + version.String())
+						}
+					}
+				}
 			}
 		}()
 

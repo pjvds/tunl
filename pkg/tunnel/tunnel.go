@@ -4,7 +4,9 @@ import (
 	"context"
 	"net"
 	"net/url"
+	"time"
 
+	"github.com/Masterminds/semver"
 	"github.com/pjvds/tunl/pkg/tunnel/client"
 	"github.com/pjvds/tunl/pkg/tunnel/state"
 	"github.com/pkg/errors"
@@ -23,6 +25,16 @@ func (t *tunnel) SetTunnelInfo(info client.TunnelInfo) {
 	t.id = info.Id
 	t.token = info.Token
 	t.address = info.Address
+
+	// if we got a version, try to announce it
+	if version := info.Version; version != nil {
+		go func() {
+			select {
+			case t.versions <- *info.Version:
+			case <-time.After(1 * time.Second):
+			}
+		}()
+	}
 }
 
 func (t *tunnel) SetToken(token string) {
@@ -47,6 +59,7 @@ type Tunnel interface {
 	Address() string
 
 	StateChanges() <-chan string
+	Versions() <-chan semver.Version
 }
 
 func (t *tunnel) Close() error {
@@ -73,12 +86,13 @@ func (t *tunnel) Accept() (net.Conn, error) {
 }
 
 type tunnel struct {
-	log     *zap.Logger
-	t       client.TunnelType
-	host    *url.URL
-	server  client.ServerInfo
-	conn    net.Conn
-	changes chan string
+	log      *zap.Logger
+	t        client.TunnelType
+	host     *url.URL
+	server   client.ServerInfo
+	conn     net.Conn
+	changes  chan string
+	versions chan semver.Version
 
 	id       string
 	token    string
@@ -109,6 +123,10 @@ func (t *tunnel) StateChanges() <-chan string {
 	return t.changes
 }
 
+func (t *tunnel) NewVersions() <-chan semver.Version {
+	return t.versions
+}
+
 func OpenTCP(ctx context.Context, log *zap.Logger, host *url.URL) (Tunnel, error) {
 	return open(ctx, log, host, client.TypeTCP)
 }
@@ -126,6 +144,7 @@ func open(ctx context.Context, log *zap.Logger, host *url.URL, t client.TunnelTy
 	done := make(chan struct{})
 	accepted := make(chan net.Conn)
 	changes := make(chan string, 10)
+	versions := make(chan semver.Version)
 
 	tunnel := &tunnel{
 		host:     host,
@@ -133,6 +152,7 @@ func open(ctx context.Context, log *zap.Logger, host *url.URL, t client.TunnelTy
 		accepted: accepted,
 		done:     done,
 		changes:  changes,
+		versions: versions,
 		t:        t,
 	}
 

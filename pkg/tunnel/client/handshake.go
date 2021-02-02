@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/Masterminds/semver"
 	"github.com/pkg/errors"
 )
 
@@ -12,6 +13,7 @@ type TunnelInfo struct {
 	Id      string
 	Token   string
 	Address string
+	Version *semver.Version
 }
 
 type TunnelInfoSetter interface {
@@ -51,10 +53,12 @@ func Handshake(conn net.Conn, hostname string, tunnel *TunnelInfo, t TunnelType)
 	id := response.Header.Get("X-Tunl-Id")
 	token := response.Header.Get("X-Tunl-Token")
 	address := response.Header.Get("X-Tunl-Address")
+	version, _ := semver.NewVersion("X-Tunl-Version")
 
 	return TunnelInfo{
 		Id:      id,
 		Token:   token,
 		Address: address,
+		Version: version,
 	}, nil
 }

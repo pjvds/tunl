@@ -16,6 +16,7 @@ import (
 	"github.com/inconshreveable/go-vhost"
 	"github.com/pjvds/tunl/pkg/tunnel/certs"
 	"github.com/pjvds/tunl/pkg/tunnel/server"
+	"github.com/pjvds/tunl/pkg/version"
 	"github.com/rcrowley/go-metrics"
 	"github.com/rs/xid"
 
@@ -227,6 +228,7 @@ var DaemonCommand = &cli.Command{
 					Header: http.Header{
 						"X-Tunl-Token":   []string{token},
 						"X-Tunl-Address": []string{address.Address},
+						"X-Tunl-Version": []string{version.String()},
 					},
 				}
 

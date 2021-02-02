@@ -1,6 +1,8 @@
 package version
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var (
 	Version   = "<unknown>"

@@ -3,6 +3,7 @@ module github.com/pjvds/tunl
 go 1.15
 
 require (
+	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Microsoft/go-winio v0.4.16 // indirect
 	github.com/armon/go-metrics v0.3.6
 	github.com/containerd/containerd v1.4.3 // indirect
