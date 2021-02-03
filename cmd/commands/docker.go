@@ -31,6 +31,10 @@ var DockerCommand = &cli.Command{
 			Name:  "copy-address",
 			Usage: "Copies the public address to the clipboard",
 		},
+		&cli.BoolFlag{
+			Name:  "tls",
+			Usage: "Open a public TLS address instead of TCP. TLS will be terminated at your local machine tunl client.",
+		},
 	},
 	Usage: "Expose a docker container port via a public address",
 	BashComplete: cli.BashCompleteFunc(func(ctx *cli.Context) {
@@ -127,7 +131,7 @@ var DockerCommand = &cli.Command{
 			return nil
 		}
 
-		tunnel, err := tunnel.OpenTCP(ctx.Context, zap.NewNop(), hostURL)
+		tunnel, err := tunnel.OpenTCP(ctx.Context, zap.NewNop(), hostURL, ctx.Bool("tls"))
 		if err != nil {
 			return cli.Exit(err.Error(), 18)
 		}
