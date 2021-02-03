@@ -164,7 +164,7 @@ var DirCommand = &cli.Command{
 				select {
 				case state := <-tunnel.StateChanges():
 					println(state)
-				case version := <-tunnel.Versions():
+				case version := <-tunnel.NewVersions():
 					current, err := semver.NewVersion(version.String())
 					if err == nil {
 						if current.LessThan(&version) {

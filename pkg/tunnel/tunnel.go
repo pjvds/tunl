@@ -59,7 +59,7 @@ type Tunnel interface {
 	Address() string
 
 	StateChanges() <-chan string
-	Versions() <-chan semver.Version
+	NewVersions() <-chan semver.Version
 }
 
 func (t *tunnel) Close() error {

@@ -317,7 +317,18 @@ var DaemonCommand = &cli.Command{
 			}))
 		}()
 
-		go mux.HandleErrors()
+		go func() {
+			for {
+				conn, err := mux.NextError()
+				if err != nil {
+					logger.Debug("mux error", zap.Error(err))
+				}
+
+				if conn != nil {
+					conn.Close()
+				}
+			}
+		}()
 
 		if err := <-failed; err != nil {
 			logger.Error("fatal error", zap.Error(err))
