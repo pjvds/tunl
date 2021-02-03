@@ -2,6 +2,29 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.30.0 - 2021-02-03
+
+
+### Bug Fixes
+
+[aa9355](https://github.com/pjvds/tunl/commit/aa9355f896b776c0576a1cf95125014b6aabdb51) - fix new version flow build errors - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[af96a3](https://github.com/pjvds/tunl/commit/af96a3373edbd0620117191b17d7af6b600b3ec4) - join host and port into a single argument - [pjvds](https://github.com/pjvds)
+
+[93388b](https://github.com/pjvds/tunl/commit/93388b29194def5a05dbb1b14168b05800b5816c) - print if new version is available - [pjvds](https://github.com/pjvds)
+
+
+### Miscellaneous Chores
+
+[ab6907](https://github.com/pjvds/tunl/commit/ab6907d3f7c7cb6d3d4e7de90e5c595cd7c66d8f) - bump go version in go.mod to go 1.16 - [pjvds](https://github.com/pjvds)
+
+[e6a721](https://github.com/pjvds/tunl/commit/e6a72169cec31af5240c3b78d706dd2cb9fcf763) - move to go 1.16 release candidate 1 - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.29.1 - 2021-01-25
 
 
