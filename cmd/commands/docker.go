@@ -20,7 +20,7 @@ import (
 
 var DockerCommand = &cli.Command{
 	Name:      "docker",
-	ArgsUsage: "<container> [port]",
+	ArgsUsage: "<container>[:<port>]",
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
 			Name:  "qr",
@@ -54,29 +54,38 @@ var DockerCommand = &cli.Command{
 		}
 	}),
 	Action: func(ctx *cli.Context) error {
-		id := ctx.Args().First()
-		if len(id) == 0 {
-			fmt.Print("Missing container id argument.\n\n")
+		containerAndPort := ctx.Args().First()
+		if len(containerAndPort) == 0 {
+			fmt.Print("Missing container argument.\n\n")
 
 			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
-			return cli.Exit("Host cannot be empty.", 1)
+			return cli.Exit("Container cannot be empty.", 1)
 		}
 
 		docker, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 		if err != nil {
 			panic(err)
 		}
-		container, err := docker.ContainerInspect(context.Background(), id)
+
+		containerSpec, portSpec, err := net.SplitHostPort(containerAndPort)
+		if err != nil {
+			fmt.Print("Invalid container argument\n\n")
+
+			cli.ShowCommandHelpAndExit(ctx, ctx.Command.Name, 1)
+			return cli.Exit(err.Error(), 1)
+		}
+
+		container, err := docker.ContainerInspect(context.Background(), containerSpec)
 		if err != nil {
 			return cli.Exit(err.Error(), 1)
 		}
 
 		var port int
 
-		if p := ctx.Args().Get(1); len(p) > 0 {
-			parsed, err := strconv.Atoi(p)
+		if len(portSpec) > 0 {
+			parsed, err := strconv.Atoi(portSpec)
 			if err != nil {
-				return cli.Exit("Invalid port: "+p, 1)
+				return cli.Exit("Invalid port: "+portSpec, 1)
 			}
 			port = parsed
 		} else {
@@ -85,7 +94,7 @@ var DockerCommand = &cli.Command{
 					port = exposedPort.Int()
 				}
 			} else {
-				return cli.Exit("Missing port argument", 1)
+				return cli.Exit("Missing port argument and no exposed ports found in container", 1)
 			}
 		}
 
