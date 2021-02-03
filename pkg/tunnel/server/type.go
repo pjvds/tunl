@@ -38,13 +38,13 @@ func (c *PublicAddress) Close() error {
 	return err
 }
 
-func NewAddresses(logger *zap.Logger, hostname string, httpMux *vhost.HTTPMuxer) *Addresses {
+func NewAddresses(logger *zap.Logger, hostname string, muxer *vhost.VhostMuxer) *Addresses {
 	metrics.SetGauge([]string{"addresses"}, 0)
 
 	return &Addresses{
 		logger:     logger,
 		hostname:   hostname,
-		httpMux:    httpMux,
+		httpMux:    muxer,
 		addresses:  make(map[string]struct{}),
 		haikunator: haikunator.New(time.Now().UnixNano()),
 	}
@@ -52,7 +52,7 @@ func NewAddresses(logger *zap.Logger, hostname string, httpMux *vhost.HTTPMuxer)
 
 type Addresses struct {
 	hostname string
-	httpMux  *vhost.HTTPMuxer
+	httpMux  *vhost.VhostMuxer
 	logger   *zap.Logger
 
 	addresses map[string]struct{}
@@ -107,6 +107,24 @@ func (c *Addresses) ClaimAddress(addressType string, address string) (*PublicAdd
 		return &PublicAddress{
 			Address:  address,
 			Listener: listener,
+			free: func() {
+				c.free(address)
+			},
+		}, nil
+	case "tls":
+		vhost, err := c.httpMux.Listen(address)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := c.put(address); err != nil {
+			vhost.Close()
+			return nil, err
+		}
+
+		return &PublicAddress{
+			Address:  address,
+			Listener: vhost,
 			free: func() {
 				c.free(address)
 			},

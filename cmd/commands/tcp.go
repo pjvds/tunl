@@ -20,6 +20,9 @@ var TcpCommand = &cli.Command{
 			Name:  "access-log",
 			Value: true,
 		},
+		&cli.BoolFlag{
+			Name: "tls",
+		},
 	},
 	Usage:     "Expose a TCP service via a public address",
 	ArgsUsage: "<host:port>",
@@ -54,10 +57,19 @@ var TcpCommand = &cli.Command{
 			return nil
 		}
 
-		tunnel, err := tunnel.OpenTCP(ctx.Context, zap.NewNop(), hostURL)
+		var created tunnel.Tunnel
+
+		if ctx.Bool("tls") {
+			created, err = tunnel.OpenTLS(ctx.Context, zap.NewNop(), hostURL)
+		} else {
+			created, err = tunnel.OpenTCP(ctx.Context, zap.NewNop(), hostURL)
+		}
+
 		if err != nil {
 			return cli.Exit(err.Error(), 18)
 		}
+
+		tunnel := created
 
 		PrintTunnel(ctx, tunnel.Address(), ctx.Args().First())
 

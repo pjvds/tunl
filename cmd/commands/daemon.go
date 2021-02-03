@@ -151,7 +151,17 @@ var DaemonCommand = &cli.Command{
 
 		logger.Debug("listener created", zap.String("address", listener.Addr().String()))
 
-		mux, err := vhost.NewHTTPMuxer(listener, 30*time.Second)
+		mux, err := vhost.NewVhostMuxer(listener, func(c net.Conn) (vhost.Conn, error) {
+			if tls, err := vhost.TLS(c); err == nil {
+				return tls, nil
+			}
+
+			if http, err := vhost.HTTP(c); err == nil {
+				return http, nil
+			}
+
+			return nil, errors.New("unsupported protocol for multiplexing")
+		}, 30*time.Second)
 		if err != nil {
 			logger.Error("vhost mux creation error", zap.Error(err))
 			return nil
