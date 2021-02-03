@@ -1,6 +1,6 @@
 module github.com/pjvds/tunl
 
-go 1.15
+go 1.16
 
 require (
 	github.com/Masterminds/semver v1.5.0 // indirect
