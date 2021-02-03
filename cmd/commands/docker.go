@@ -22,9 +22,14 @@ var DockerCommand = &cli.Command{
 	Name:      "docker",
 	ArgsUsage: "<container>[:<port>]",
 	Flags: []cli.Flag{
+		CopyToClipboardFlag,
 		&cli.BoolFlag{
 			Name:  "qr",
 			Usage: "Print QR code of the public address",
+		},
+		&cli.BoolFlag{
+			Name:  "copy-address",
+			Usage: "Copies the public address to the clipboard",
 		},
 	},
 	Usage: "Expose a docker container port via a public address",

@@ -16,6 +16,7 @@ import (
 var TcpCommand = &cli.Command{
 	Name: "tcp",
 	Flags: []cli.Flag{
+		CopyToClipboardFlag,
 		&cli.BoolFlag{
 			Name:  "access-log",
 			Value: true,

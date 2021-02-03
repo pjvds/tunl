@@ -7,6 +7,7 @@ import (
 var FilesCommand = &cli.Command{
 	Name: "files",
 	Flags: []cli.Flag{
+		CopyToClipboardFlag,
 		&cli.BoolFlag{
 			Name:  "access-log",
 			Value: true,

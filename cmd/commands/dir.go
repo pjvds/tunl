@@ -21,6 +21,7 @@ import (
 var DirCommand = &cli.Command{
 	Name: "dir",
 	Flags: []cli.Flag{
+		CopyToClipboardFlag,
 		&cli.BoolFlag{
 			Name:  "access-log",
 			Value: true,

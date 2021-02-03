@@ -16,4 +16,6 @@ func PrintTunnel(ctx *cli.Context, publicAddress string, target string) {
 	if ctx.Bool("qr") {
 		qrterminal.GenerateHalfBlock(publicAddress, qrterminal.L, os.Stdout)
 	}
+
+	CopyAddressToClipboardIfRequired(ctx, publicAddress)
 }

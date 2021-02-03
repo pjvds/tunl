@@ -22,6 +22,7 @@ import (
 var HttpCommand = &cli.Command{
 	Name: "http",
 	Flags: []cli.Flag{
+		CopyToClipboardFlag,
 		&cli.BoolFlag{
 			Name:  "access-log",
 			Usage: "Print http requests in Apache Log format to stderr",

@@ -19,6 +19,7 @@ import (
 var WebdavCommand = &cli.Command{
 	Name: "webdav",
 	Flags: []cli.Flag{
+		CopyToClipboardFlag,
 		&cli.BoolFlag{
 			Name:  "access-log",
 			Value: true,
