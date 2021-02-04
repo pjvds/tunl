@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.31.0 - 2021-02-04
+
+
+### Features
+
+[6ebbe2](https://github.com/pjvds/tunl/commit/6ebbe29ffde398ad2d78afcab1c166baec41868d) - adds ability to setup TLS tunnel - [pjvds](https://github.com/pjvds)
+
+[9b446d](https://github.com/pjvds/tunl/commit/9b446d61fb3e41ec31ff9b025a6e6e935de48635) - adds ability to copy public address to clipboard - [pjvds](https://github.com/pjvds)
+
+[43147c](https://github.com/pjvds/tunl/commit/43147c0fb67bcc3cecc01662f4186ffa2ceab00c) - add TLS flag to open public vhost that can be routed by name - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.30.0 - 2021-02-03
 
 
