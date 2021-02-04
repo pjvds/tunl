@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.33.0 - 2021-02-04
+
+
+### Revert
+
+[dcdf89](https://github.com/pjvds/tunl/commit/dcdf893b274f9f3c2079d409a5d5b0e43a9af8c4) - remove raw tcp tunnel over tls - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.32.1 - 2021-02-04
 
 
