@@ -124,31 +124,24 @@ var DaemonCommand = &cli.Command{
 		tunnelCount := metrics.GetOrRegisterCounter("tunnel", nil)
 		connectionCount := metrics.GetOrRegisterCounter("connections", nil)
 
+		var tlsConfig *tls.Config
+
 		var listener net.Listener
 		if certGlobs := ctx.StringSlice("tls-certs"); len(certGlobs) > 0 {
-			certs, err := certs.LoadCertificates(certGlobs)
+			loadedCerts, err := certs.LoadCertificates(certGlobs)
 			if err != nil {
 				logger.Error("load certificate error", zap.Error(err), zap.Strings("certs", certGlobs))
 				return nil
 			}
 
-			tlsListener, err := tls.Listen("tcp", bind, &tls.Config{
-				Certificates: certs,
-			})
-			if err != nil {
-				logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
-				return nil
-			}
-			listener = tlsListener
-		} else {
-			nonTlsListener, err := net.Listen("tcp", bind)
-			if err != nil {
-				logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
-				return nil
-			}
-			listener = nonTlsListener
+			tlsConfig = &tls.Config{Certificates: loadedCerts}
 		}
 
+		listener, err := net.Listen("tcp", bind)
+		if err != nil {
+			logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
+			return nil
+		}
 		logger.Debug("listener created", zap.String("address", listener.Addr().String()))
 
 		mux, err := vhost.NewVhostMuxer(listener, func(c net.Conn) (vhost.Conn, error) {
@@ -156,7 +149,7 @@ var DaemonCommand = &cli.Command{
 			if tlsErr == nil {
 				return tls, nil
 			}
-			http, httpErr := vhost.HTTP(c)
+			http, httpErr := vhost.HTTP(tls)
 			if httpErr == nil {
 				return http, nil
 			}
@@ -172,7 +165,7 @@ var DaemonCommand = &cli.Command{
 		}
 		defer mux.Close()
 
-		addresses := server.NewAddresses(logger, ctx.String("domain"), mux)
+		addresses := server.NewAddresses(logger, ctx.String("domain"), tlsConfig, mux)
 
 		failed := make(chan error)
 

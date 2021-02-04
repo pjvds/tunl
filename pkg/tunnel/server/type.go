@@ -1,6 +1,7 @@
 package server
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net"
@@ -38,13 +39,14 @@ func (c *PublicAddress) Close() error {
 	return err
 }
 
-func NewAddresses(logger *zap.Logger, hostname string, muxer *vhost.VhostMuxer) *Addresses {
+func NewAddresses(logger *zap.Logger, hostname string, tlsConfig *tls.Config, muxer *vhost.VhostMuxer) *Addresses {
 	metrics.SetGauge([]string{"addresses"}, 0)
 
 	return &Addresses{
 		logger:     logger,
 		hostname:   hostname,
 		httpMux:    muxer,
+		tlsConfig:  tlsConfig,
 		addresses:  make(map[string]struct{}),
 		haikunator: haikunator.New(time.Now().UnixNano()),
 	}
@@ -54,6 +56,8 @@ type Addresses struct {
 	hostname string
 	httpMux  *vhost.VhostMuxer
 	logger   *zap.Logger
+
+	tlsConfig *tls.Config
 
 	addresses map[string]struct{}
 	lock      sync.RWMutex
@@ -123,8 +127,13 @@ func (c *Addresses) ClaimAddress(addressType string, address string) (*PublicAdd
 		}
 
 		return &PublicAddress{
-			Address:  address,
-			Listener: vhost,
+			Address: address,
+			Listener: &ListenInterceptor{
+				Interceptor: func(conn net.Conn) (net.Conn, error) {
+					return tls.Server(conn, c.tlsConfig), nil
+				},
+				Listener: vhost,
+			},
 			free: func() {
 				c.free(address)
 			},
@@ -188,6 +197,35 @@ func (c *Addresses) NewAddress(addressType string) (*PublicAddress, error) {
 				c.free(address)
 			},
 		}, nil
+	case "tls":
+		id := c.haikunator.Haikunate()
+
+		hostname := fmt.Sprintf("%s.%s", id, c.hostname)
+		address := fmt.Sprintf("https://%s", hostname)
+
+		vhost, err := c.httpMux.Listen(address)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := c.put(address); err != nil {
+			vhost.Close()
+			return nil, err
+		}
+
+		return &PublicAddress{
+			Address: address,
+			Listener: &ListenInterceptor{
+				Interceptor: func(conn net.Conn) (net.Conn, error) {
+					return tls.Server(conn, c.tlsConfig), nil
+				},
+				Listener: vhost,
+			},
+			free: func() {
+				c.free(address)
+			},
+		}, nil
+
 	default:
 		id := c.haikunator.Haikunate()
 
