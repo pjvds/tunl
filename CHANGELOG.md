@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.32.1 - 2021-02-04
+
+
+### Bug Fixes
+
+[81281b](https://github.com/pjvds/tunl/commit/81281b06d3aa323ac52a8bdb09d9147aacf749ff) - fix tls server connection handshake - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.32.0 - 2021-02-04
 
 
