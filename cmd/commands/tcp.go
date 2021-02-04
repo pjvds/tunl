@@ -21,10 +21,6 @@ var TcpCommand = &cli.Command{
 			Name:  "access-log",
 			Value: true,
 		},
-		&cli.BoolFlag{
-			Name:  "tls",
-			Usage: "Open a public TLS address instead of TCP. TLS will be terminated at your local machine tunl client.",
-		},
 	},
 	Usage:     "Expose a TCP service via a public address",
 	ArgsUsage: "<host:port>",
@@ -59,7 +55,7 @@ var TcpCommand = &cli.Command{
 			return nil
 		}
 
-		tunnel, err := tunnel.OpenTCP(ctx.Context, zap.NewNop(), hostURL, ctx.Bool("tls"))
+		tunnel, err := tunnel.OpenTCP(ctx.Context, zap.NewNop(), hostURL)
 		if err != nil {
 			return cli.Exit(err.Error(), 18)
 		}

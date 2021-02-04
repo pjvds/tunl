@@ -127,14 +127,8 @@ func (t *tunnel) NewVersions() <-chan semver.Version {
 	return t.versions
 }
 
-func OpenTCP(ctx context.Context, log *zap.Logger, host *url.URL, tls bool) (Tunnel, error) {
-	tunnelType := client.TypeTCP
-
-	if tls {
-		tunnelType = client.TypeTLS
-	}
-
-	return open(ctx, log, host, tunnelType)
+func OpenTCP(ctx context.Context, log *zap.Logger, host *url.URL) (Tunnel, error) {
+	return open(ctx, log, host, client.TypeTCP)
 }
 
 func OpenHTTP(ctx context.Context, log *zap.Logger, host *url.URL) (Tunnel, error) {

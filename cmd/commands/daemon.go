@@ -124,48 +124,41 @@ var DaemonCommand = &cli.Command{
 		tunnelCount := metrics.GetOrRegisterCounter("tunnel", nil)
 		connectionCount := metrics.GetOrRegisterCounter("connections", nil)
 
-		var tlsConfig *tls.Config
-
 		var listener net.Listener
 		if certGlobs := ctx.StringSlice("tls-certs"); len(certGlobs) > 0 {
-			loadedCerts, err := certs.LoadCertificates(certGlobs)
+			certs, err := certs.LoadCertificates(certGlobs)
 			if err != nil {
 				logger.Error("load certificate error", zap.Error(err), zap.Strings("certs", certGlobs))
 				return nil
 			}
 
-			tlsConfig = &tls.Config{Certificates: loadedCerts}
+			tlsListener, err := tls.Listen("tcp", bind, &tls.Config{
+				Certificates: certs,
+			})
+			if err != nil {
+				logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
+				return nil
+			}
+			listener = tlsListener
+		} else {
+			nonTlsListener, err := net.Listen("tcp", bind)
+			if err != nil {
+				logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
+				return nil
+			}
+			listener = nonTlsListener
 		}
 
-		listener, err := net.Listen("tcp", bind)
-		if err != nil {
-			logger.Error("listen error failed to listen", zap.Error(err), zap.String("bind", bind))
-			return nil
-		}
 		logger.Debug("listener created", zap.String("address", listener.Addr().String()))
 
-		mux, err := vhost.NewVhostMuxer(listener, func(c net.Conn) (vhost.Conn, error) {
-			tls, tlsErr := vhost.TLS(c)
-			if tlsErr == nil {
-				return tls, nil
-			}
-			http, httpErr := vhost.HTTP(tls)
-			if httpErr == nil {
-				return http, nil
-			}
-
-			logger.Debug("connection is not a TLS connection", zap.Error(tlsErr))
-			logger.Debug("connection is not a HTTP connection", zap.Error(httpErr))
-
-			return nil, errors.New("unsupported protocol for multiplexing")
-		}, 30*time.Second)
+		mux, err := vhost.NewHTTPMuxer(listener, 30*time.Second)
 		if err != nil {
 			logger.Error("vhost mux creation error", zap.Error(err))
 			return nil
 		}
 		defer mux.Close()
 
-		addresses := server.NewAddresses(logger, ctx.String("domain"), tlsConfig, mux)
+		addresses := server.NewAddresses(logger, ctx.String("domain"), mux)
 
 		failed := make(chan error)
 

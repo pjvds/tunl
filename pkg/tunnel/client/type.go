@@ -8,7 +8,6 @@ type TunnelType interface {
 
 var TypeHTTP = typeHeaderValue("http")
 var TypeTCP = typeHeaderValue("tcp")
-var TypeTLS = typeHeaderValue("tls")
 
 type typeHeaderValue string
 
