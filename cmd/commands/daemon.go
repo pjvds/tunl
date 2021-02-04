@@ -152,13 +152,17 @@ var DaemonCommand = &cli.Command{
 		logger.Debug("listener created", zap.String("address", listener.Addr().String()))
 
 		mux, err := vhost.NewVhostMuxer(listener, func(c net.Conn) (vhost.Conn, error) {
-			if tls, err := vhost.TLS(c); err == nil {
+			tls, tlsErr := vhost.TLS(c)
+			if tlsErr == nil {
 				return tls, nil
 			}
-
-			if http, err := vhost.HTTP(c); err == nil {
+			http, httpErr := vhost.HTTP(c)
+			if httpErr == nil {
 				return http, nil
 			}
+
+			logger.Debug("connection is not a TLS connection", zap.Error(tlsErr))
+			logger.Debug("connection is not a HTTP connection", zap.Error(httpErr))
 
 			return nil, errors.New("unsupported protocol for multiplexing")
 		}, 30*time.Second)
