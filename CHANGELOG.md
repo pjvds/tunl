@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.32.0 - 2021-02-04
+
+
+### Features
+
+[460be1](https://github.com/pjvds/tunl/commit/460be1c0729ce1a4d1644e2bb2edac29b8c3cdd5) - log vhost connection type discovery failure details - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.31.0 - 2021-02-04
 
 
