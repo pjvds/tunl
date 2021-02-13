@@ -12,8 +12,8 @@ https://red-fox.tunl.es/ -> http://localhost:3000
 ## Share a local directory
 
 ```
-$ tunl files /the/directory
-https://red-fox.tunl.es/ -> /the/directory
+$ tunl files /dir
+https://red-fox.tunl.es/ -> /dir
 ```
 
 ## Expose a local MySQL
@@ -26,7 +26,7 @@ tunl.es:89311 -> localhost:3306
 ## Expose a service running in a docker container
 
 ```
-$ tunl docker <container-name> <port>
+$ tunl docker [container-name]:<port>
 tunl.es:48221 -> <container-name>:<port>
 ```
 
