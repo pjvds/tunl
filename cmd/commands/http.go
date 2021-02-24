@@ -8,6 +8,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -53,7 +54,15 @@ var HttpCommand = &cli.Command{
 		}
 
 		if !strings.Contains(target, "://") {
-			target = "http://" + target
+			if strings.HasPrefix(target, ":") {
+				target = target[1:]
+			}
+
+			if port, err := strconv.Atoi(target); err != nil {
+				target = fmt.Sprint("http://localhost:%v", port)
+			} else {
+				target = "http://" + target
+			}
 		}
 
 		parsed, err := url.Parse(target)
