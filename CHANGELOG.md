@@ -2,6 +2,25 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.34.0 - 2021-02-24
+
+
+### Documentation
+
+[d86c03](https://github.com/pjvds/tunl/commit/d86c03fda445dd1d1352aa08afcd012ef8b985c7) - align sample code with latest release - [pjvds](https://github.com/pjvds)
+
+
+### Miscellaneous Chores
+
+[abf9ef](https://github.com/pjvds/tunl/commit/abf9ef439bbc7957f84d51ef8ad74d7939f084d2) - build with stable go1.16 - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[37a3db](https://github.com/pjvds/tunl/commit/37a3db7ade6aa8b0b3d650f4c309940b316fd2c5) - allow http target to only be a port - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.33.0 - 2021-02-04
 
 
