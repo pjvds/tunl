@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.35.0 - 2021-03-01
+
+
+### Bug Fixes
+
+[dc7f81](https://github.com/pjvds/tunl/commit/dc7f813b794a40c0f540a33e1bee97fad68f849e) - fix invalid address parsing when <host>:<port> is specified - [pjvds](https://github.com/pjvds)
+
+
+### Features
+
+[0c5863](https://github.com/pjvds/tunl/commit/0c58634b9935747d38bfcf9101307e4e5982dbd5) - introduce version command - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.34.0 - 2021-02-24
 
 
