@@ -58,8 +58,8 @@ var HttpCommand = &cli.Command{
 				target = target[1:]
 			}
 
-			if port, err := strconv.Atoi(target); err != nil {
-				target = fmt.Sprint("http://localhost:%v", port)
+			if port, err := strconv.Atoi(target); err == nil {
+				target = fmt.Sprintf("http://localhost:%v", port)
 			} else {
 				target = "http://" + target
 			}
