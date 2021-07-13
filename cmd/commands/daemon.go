@@ -259,7 +259,7 @@ var DaemonCommand = &cli.Command{
 					for {
 						conn, err := address.Accept()
 						if err != nil {
-							logger.Debug("accept error", zap.Error(err))
+							logger.Debug("vhost accept error", zap.Error(err))
 							return
 						}
 
@@ -321,7 +321,30 @@ var DaemonCommand = &cli.Command{
 			for {
 				conn, err := mux.NextError()
 				if err != nil {
-					logger.Debug("mux error", zap.Error(err))
+							switch err.(type){
+							case vhost.BadRequest:
+								logger.Debug("vhost accept error: bad request", zap.Error(err))
+								break
+
+							case vhost.NotFound:
+								logger.Error("vhost mux reached unknown host")
+								(&http.Response{
+									Status: "not found",
+									StatusCode: http.StatusNotFound,
+								}).Write(conn)
+								break
+
+							case vhost.Closed:
+								logger.Error("vhost mux reached closed host")
+								(&http.Response{
+									Status: "not found",
+									StatusCode: http.StatusGone,
+								}).Write(conn)
+								break
+							default:
+								logger.Debug("unknown mux error", zap.Error(err))
+							}
+
 				}
 
 				if conn != nil {
