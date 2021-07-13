@@ -11,6 +11,20 @@ All notable changes to this project will be documented in this file. See [conven
 
 
 - - -
+## 0.35.0 - 2021-03-01
+
+
+### Features
+
+[0c58634](https://github.com/pjvds/tunl/commit/0c58634b9935747d38bfcf9101307e4e5982dbd5) - introduce version command - [pjvds](https://github.com/pjvds)
+
+
+### Bug Fixes
+
+[dc7f813](https://github.com/pjvds/tunl/commit/dc7f813b794a40c0f540a33e1bee97fad68f849e) - fix invalid address parsing when : is specified - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.34.0 - 2021-02-24
 
 
