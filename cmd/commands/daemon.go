@@ -195,12 +195,16 @@ var DaemonCommand = &cli.Command{
 				if len(tunlToken) > 0 {
 					token, err := verifyToken(signKey, tunlToken)
 					if err != nil {
+						logger.Info("invalid tunl token", zap.String("token", tunlToken), zap.Error(err))
+
 						http.Error(response, err.Error(), http.StatusInternalServerError)
 						return
 					}
 
 					address, err = addresses.ClaimAddress(tunlType, token.Subject)
 					if err != nil {
+						logger.Info("address claim error", zap.String("address", token.Subject))
+
 						http.Error(response, err.Error(), http.StatusInternalServerError)
 						return
 					}
