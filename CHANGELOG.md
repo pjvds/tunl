@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.35.1 - 2021-07-13
+
+
+### Bug Fixes
+
+[672c86](https://github.com/pjvds/tunl/commit/672c8643e3eeb85712562f347f9281d649dc1878) - fix http response for unknown vhosts - [pjvds](https://github.com/pjvds)
+
+
+- - -
 ## 0.34.0 - 2021-02-24
 
 
