@@ -2,16 +2,15 @@ package commands
 
 import (
 	"crypto/tls"
-	"io"
-	"sync"
-
 	"fmt"
+	"io"
 	"net"
 	"net/http"
+	"sync"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	honeycomb "github.com/getspine/go-metrics-honeycomb"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/hashicorp/yamux"
 	"github.com/inconshreveable/go-vhost"
 	"github.com/pjvds/tunl/pkg/tunnel/certs"
@@ -26,37 +25,39 @@ import (
 )
 
 func createToken(signKey string, id string) (string, error) {
-	claims := jwt.StandardClaims{
-		Id:        xid.New().String(),
+	now := time.Now().UTC()
+	claims := &jwt.RegisteredClaims{
+		Audience:  jwt.ClaimStrings{"tunnel"},
+		ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(24) * time.Hour)),
+		ID:        xid.New().String(),
+		IssuedAt:  jwt.NewNumericDate(now),
 		Issuer:    "tunl",
 		Subject:   id,
-		Audience:  "tunnels",
-		ExpiresAt: time.Now().Add(24 * time.Hour).UTC().Unix(),
-		IssuedAt:  time.Now().UTC().Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(signKey))
 }
 
-func verifyToken(signKey string, tokenString string) (*jwt.StandardClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+func verifyToken(signKey string, tokenString string) (*jwt.RegisteredClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(signKey), nil
 	})
-
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid token")
 	}
 
-	claims, ok := token.Claims.(*jwt.StandardClaims)
+	claims, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !ok || !token.Valid {
 		return nil, errors.New("invalid token")
 	}
 
-	if !claims.VerifyExpiresAt(time.Now().UTC().Unix(), false) {
+	expireAt, err := token.Claims.GetExpirationTime()
+	is_token_valid := err == nil && time.Now().Before(expireAt.Time)
+	if !is_token_valid {
 		return nil, errors.New("token expired")
 	}
 
@@ -325,30 +326,29 @@ var DaemonCommand = &cli.Command{
 			for {
 				conn, err := mux.NextError()
 				if err != nil {
-							switch err.(type){
-							case vhost.BadRequest:
-								logger.Debug("vhost accept error: bad request", zap.Error(err))
-								break
+					switch err.(type) {
+					case vhost.BadRequest:
+						logger.Debug("vhost accept error: bad request", zap.Error(err))
+						break
 
-							case vhost.NotFound:
-								logger.Error("vhost mux reached unknown host")
-								(&http.Response{
-									Status: "not found",
-									StatusCode: http.StatusNotFound,
-								}).Write(conn)
-								break
+					case vhost.NotFound:
+						logger.Error("vhost mux reached unknown host")
+						(&http.Response{
+							Status:     "not found",
+							StatusCode: http.StatusNotFound,
+						}).Write(conn)
+						break
 
-							case vhost.Closed:
-								logger.Error("vhost mux reached closed host")
-								(&http.Response{
-									Status: "not found",
-									StatusCode: http.StatusGone,
-								}).Write(conn)
-								break
-							default:
-								logger.Debug("unknown mux error", zap.Error(err))
-							}
-
+					case vhost.Closed:
+						logger.Error("vhost mux reached closed host")
+						(&http.Response{
+							Status:     "not found",
+							StatusCode: http.StatusGone,
+						}).Write(conn)
+						break
+					default:
+						logger.Debug("unknown mux error", zap.Error(err))
+					}
 				}
 
 				if conn != nil {
